@@ -33,9 +33,10 @@ class TestWithJobParameters {
                 .toJobParameters();
 
         JobExecution jobExecution = jobLauncherTestUtils.launchJob(jobParameters);
-        assertEquals(jobExecution.getStatus(), BatchStatus.COMPLETED);
+        assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());
     }
 
+    @SuppressWarnings("WeakerAccess")
     @Configuration
     @EnableBatchProcessing
     static class TestConfig {
