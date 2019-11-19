@@ -1,4 +1,10 @@
 <#-- @ftlvariable name="jobExecution" type="org.springframework.batch.core.JobExecution" -->
+<#-- @ftlvariable name="stepExecution" type="org.springframework.batch.core.StepExecution" -->
+
+<#macro fg color>${'\x1B'}[${30 + color}m</#macro>
+
+<#--Blue color macro-->
+<@fg 4 />
 
     -------------------------------------------------------------------
       __        _        __
@@ -9,9 +15,29 @@
                                                                   |___/
     -------------------------------------------------------------------
 
+
 <#if jobExecution??>
-    Job name: ${jobExecution.jobInstance.jobName!""}
-    Parameters ${jobExecution.jobParameters!""}
-    Status: ${jobExecution.status!""}
+    <#if jobExecution.jobInstance??>
+        Job name: ${jobExecution.jobInstance.jobName!""}
+        Job InstanceId: ${jobExecution.jobInstance.instanceId!""}
+    <#else>
+        JobInstance not found
+    </#if>
+        Parameters ${jobExecution.jobParameters!""}
+        Running: ${jobExecution.running?string('yes', 'no')!""}
+        Status: ${jobExecution.status!""}
+        StartTime: ${jobExecution.startTime?string('HH:mm:ss')!""}
+        EndTime: ${jobExecution.endTime?string('HH:mm:ss')!""}
+        Steps:
+        <#list jobExecution.stepExecutions as stepExecution>
+             ${stepExecution.stepName!""}
+                - Id: ${stepExecution.id!""}
+                - Status: ${stepExecution.status!""}
+                - ReadCount | WriteCount | FilterCount: ${stepExecution.readCount!""} | ${stepExecution.writeCount!""} | ${stepExecution.filterCount!""}
+                - ReadSkipCount | WriteSkipCount | ProcessSkipCount: ${stepExecution.readSkipCount!""} | ${stepExecution.writeSkipCount!""} | ${stepExecution.processSkipCount!""}
+                - CommitCount: ${stepExecution.commitCount!""}
+                - RollbackCount: ${stepExecution.rollbackCount!""}
+        </#list> <#--Red Color macro--> <@fg 1 />
+        Errors:
 
 </#if>
