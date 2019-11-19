@@ -17,6 +17,7 @@
 	<properties>
 		<java.version>1.8</java.version>
 		<junit-jupiter-api.version>5.3.2</junit-jupiter-api.version>
+		<freemarker.version>2.3.29</freemarker.version>
 	</properties>
 
 	<dependencies>
@@ -31,6 +32,12 @@
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.freemarker</groupId>
+			<artifactId>freemarker</artifactId>
+			<version>${freemarker.version}</version>
 		</dependency>
 
 		<dependency>

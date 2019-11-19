@@ -1,4 +1,4 @@
-package de.oette.course.batch.chapter1;
+package de.oette.course.batch.chapter2;
 
 import de.oette.course.batch.testutils.CourseUtilBatchTestConfig;
 import org.junit.jupiter.api.Test;
