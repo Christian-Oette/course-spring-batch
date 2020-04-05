@@ -1,4 +1,4 @@
-package de.oette.course.batch.testutils;
+package com.christianoette.testutils;
 
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
 import org.springframework.batch.test.JobLauncherTestUtils;

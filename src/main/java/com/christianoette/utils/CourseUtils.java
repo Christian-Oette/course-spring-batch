@@ -1,4 +1,4 @@
-package de.oette.course.batch.utils;
+package com.christianoette.utils;
 
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.util.ResourceUtils;

@@ -1,1 +1,7 @@
-Spring Batch Course - Add URL here
+====================================
+
+Spring Batch Beginner Course
+https://christianoette.com
+
+====================================
+

@@ -1,6 +1,6 @@
-package de.oette.course.batch.chapter1;
+package com.christianoette.chapter1;
 
-import de.oette.course.batch.testutils.CourseUtilBatchTestConfig;
+import com.christianoette.testutils.CourseUtilBatchTestConfig;
 import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.*;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;

@@ -1,4 +1,4 @@
-package de.oette.course.batch.chapter1_helloBatch;
+package com.christianoette.chapter1;
 
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;

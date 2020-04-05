@@ -1,5 +1,6 @@
-package de.oette.course.batch.chapter1;
+package com.christianoette.chapter1;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
@@ -20,6 +21,7 @@ class HelloWorldTest {
     private JobLauncherTestUtils jobLauncherTestUtils;
 
     @Test
+    @Disabled
     void runJob() throws Exception {
         jobLauncherTestUtils.launchJob();
     }

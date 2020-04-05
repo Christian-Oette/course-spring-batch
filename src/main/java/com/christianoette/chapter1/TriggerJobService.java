@@ -1,4 +1,4 @@
-package de.oette.course.batch.chapter1_helloBatch;
+package com.christianoette.chapter1;
 
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecutionException;
@@ -18,8 +18,7 @@ public class TriggerJobService {
     @Autowired
     private Job createJob;
 
-    @EventListener(value = ApplicationStartedEvent.class)
-    public void triggerJobOnStart() throws JobExecutionException, InterruptedException {
+    public void runJobs() throws JobExecutionException, InterruptedException {
         JobParameters jobParams = new JobParameters();
         Thread.sleep(3000);
         jobLauncher.run(createJob, jobParams);
