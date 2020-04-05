@@ -1,4 +1,4 @@
-package com.christianoette.chapter1;
+package com.christianoette.chapter2;
 
 import com.christianoette.testutils.CourseUtilBatchTestConfig;
 import org.junit.jupiter.api.Test;

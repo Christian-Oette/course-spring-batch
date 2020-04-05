@@ -1,4 +1,4 @@
-package com.christianoette.chapter1;
+package com.christianoette.chapter2;
 
 import com.christianoette.testutils.CourseUtilBatchTestConfig;
 import com.christianoette.utils.CourseUtils;
@@ -8,13 +8,13 @@ import org.springframework.batch.core.configuration.annotation.JobBuilderFactory
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.builder.SimpleStepBuilder;
 import org.springframework.batch.core.step.builder.StepBuilder;
+import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.json.JacksonJsonObjectMarshaller;
 import org.springframework.batch.item.json.JacksonJsonObjectReader;
 import org.springframework.batch.item.json.JsonFileItemWriter;
 import org.springframework.batch.item.json.JsonItemReader;
 import org.springframework.batch.item.json.builder.JsonFileItemWriterBuilder;
 import org.springframework.batch.item.json.builder.JsonItemReaderBuilder;
-import org.springframework.batch.item.support.PassThroughItemProcessor;
 import org.springframework.batch.test.JobLauncherTestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -26,8 +26,8 @@ import org.springframework.transaction.PlatformTransactionManager;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-@SpringBootTest(classes = {ItemWriterTest.TestConfig.class, CourseUtilBatchTestConfig.class})
-class ItemWriterTest {
+@SpringBootTest(classes = {ProcessorTest.TestConfig.class, CourseUtilBatchTestConfig.class})
+class ProcessorTest {
 
     @Autowired
     private JobLauncherTestUtils jobLauncherTestUtils;
@@ -55,6 +55,7 @@ class ItemWriterTest {
         @Autowired
         private PlatformTransactionManager transactionManager;
 
+
         @Bean
         public Job job() {
             return jobBuilderFactory.get("myJob")
@@ -64,40 +65,60 @@ class ItemWriterTest {
 
         @Bean
         public Step step() {
-            SimpleStepBuilder<InAndOutData, InAndOutData> chunk = new StepBuilder("reader")
+            SimpleStepBuilder<InputData, OutputData> chunk = new StepBuilder("reader")
                     .repository(jobRepository)
                     .transactionManager(transactionManager)
                     .chunk(1);
 
             return chunk.reader(reader())
-                    .processor(new PassThroughItemProcessor<>())
+                    .processor(processor())
                     .writer(writer())
                     .build();
         }
 
         @Bean
-        public JsonItemReader<InAndOutData> reader() {
+        public ItemProcessor<InputData, OutputData> processor() {
+            return item -> {
+                OutputData outputData = new OutputData();
+                outputData.value = item.value.toUpperCase();
+                return outputData;
+            };
+        }
+
+        @Bean
+        public JsonItemReader<InputData> reader() {
             Resource inputResource = CourseUtils.getFileResource("classpath:files/input.json");
 
-            return new JsonItemReaderBuilder<InAndOutData>()
-                    .jsonObjectReader(new JacksonJsonObjectReader<>(InAndOutData.class))
+            return new JsonItemReaderBuilder<InputData>()
+                    .jsonObjectReader(new JacksonJsonObjectReader<>(InputData.class))
                     .resource(inputResource)
                     .name("tradeJsonItemReader")
                     .build();
         }
 
         @Bean
-        public JsonFileItemWriter<InAndOutData> writer() {
+        public JsonFileItemWriter<OutputData> writer() {
             Resource outputResource = new FileSystemResource("output/output.json");
 
-            return new JsonFileItemWriterBuilder<InAndOutData>()
+            return new JsonFileItemWriterBuilder<OutputData>()
                     .jsonObjectMarshaller(new JacksonJsonObjectMarshaller<>())
                     .resource(outputResource)
                     .name("tradeJsonItemReader")
                     .build();
         }
 
-        public static class InAndOutData {
+        public static class InputData {
+            public String value;
+
+            @Override
+            public String toString() {
+                return "Data{" +
+                        "value='" + value + '\'' +
+                        '}';
+            }
+        }
+
+        public static class OutputData {
             public String value;
 
             @Override
