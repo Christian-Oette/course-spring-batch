@@ -10,13 +10,14 @@
 	</parent>
 	<groupId>de.oette</groupId>
 	<artifactId>course.batch</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>1.0.0-SNAPSHOT</version>
 	<name>course.batch</name>
 	<description>Spring Batch Course for Beginners</description>
 
 	<properties>
 		<java.version>1.11</java.version>
 		<junit-jupiter-api.version>5.3.2</junit-jupiter-api.version>
+		<freemarker.version>2.3.29</freemarker.version>
 	</properties>
 
 	<dependencies>
@@ -31,6 +32,12 @@
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.freemarker</groupId>
+			<artifactId>freemarker</artifactId>
+			<version>${freemarker.version}</version>
 		</dependency>
 
 		<dependency>
