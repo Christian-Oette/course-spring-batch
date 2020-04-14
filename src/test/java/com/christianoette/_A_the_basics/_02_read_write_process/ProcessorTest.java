@@ -87,7 +87,7 @@ class ProcessorTest {
 
         @Bean
         public JsonItemReader<InputData> reader() {
-            Resource inputResource = CourseUtils.getFileResource("classpath:files/input.json");
+            Resource inputResource = CourseUtils.getFileResource("classpath:files/_A/input.json");
 
             return new JsonItemReaderBuilder<InputData>()
                     .jsonObjectReader(new JacksonJsonObjectReader<>(InputData.class))

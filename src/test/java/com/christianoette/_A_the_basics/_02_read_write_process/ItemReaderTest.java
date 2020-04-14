@@ -74,7 +74,7 @@ class ItemReaderTest {
         public JsonItemReader<Input> reader() {
             File file = null;
             try {
-                file = ResourceUtils.getFile("classpath:files/input.json");
+                file = ResourceUtils.getFile("classpath:files/_A/input.json");
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
             }

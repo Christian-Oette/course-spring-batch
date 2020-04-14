@@ -77,7 +77,7 @@ class ItemWriterTest {
 
         @Bean
         public JsonItemReader<InAndOutData> reader() {
-            Resource inputResource = CourseUtils.getFileResource("classpath:files/input.json");
+            Resource inputResource = CourseUtils.getFileResource("classpath:files/_A/input.json");
 
             return new JsonItemReaderBuilder<InAndOutData>()
                     .jsonObjectReader(new JacksonJsonObjectReader<>(InAndOutData.class))

@@ -5,6 +5,7 @@ import com.christianoette.utils.CourseUtils;
 import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.*;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
+import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepScope;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.builder.SimpleStepBuilder;
@@ -24,7 +25,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
-import org.springframework.transaction.PlatformTransactionManager;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -38,7 +38,7 @@ class StepScopeTest {
     void runJob() throws Exception {
         JobParameters jobParameters = new JobParametersBuilder()
                 .addParameter("outputText", new JobParameter("Hello Spring Batch"))
-                .addParameter("inputPath", new JobParameter("classpath:files/input.json"))
+                .addParameter("inputPath", new JobParameter("classpath:files/_A/input.json"))
                 .toJobParameters();
 
         JobExecution jobExecution = jobLauncherTestUtils.launchJob(jobParameters);
@@ -56,7 +56,7 @@ class StepScopeTest {
         private JobRepository jobRepository;
 
         @Autowired
-        private PlatformTransactionManager transactionManager;
+        private StepBuilderFactory stepBuilderFactory;
 
 
         @Bean
@@ -68,12 +68,9 @@ class StepScopeTest {
 
         @Bean
         public Step step() {
-            SimpleStepBuilder<InputData, OutputData> chunk = new StepBuilder("jsonItemReader")
+            SimpleStepBuilder<InputData, OutputData> chunk = stepBuilderFactory.get("jsonItemReader")
                     .repository(jobRepository)
-                    .transactionManager(transactionManager)
                     .chunk(1);
-
-            //stepExecution.getExecutionContext().put("inputPath", "classpath:files/input.json");
             return chunk.reader(jsonItemReader(null))
                     .processor(processor())
                     .writer(writer())

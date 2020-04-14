@@ -1,14 +1,16 @@
-package com.christianoette._A_the_basics._03_scopes;
+package com.christianoette._A_the_basics._05_chunks;
 
 import com.christianoette.testutils.CourseUtilBatchTestConfig;
 import com.christianoette.utils.CourseUtils;
+import org.hibernate.validator.internal.IgnoreForbiddenApisErrors;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.*;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
+import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepScope;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.builder.SimpleStepBuilder;
-import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.json.JacksonJsonObjectMarshaller;
 import org.springframework.batch.item.json.JacksonJsonObjectReader;
@@ -24,21 +26,20 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
-import org.springframework.transaction.PlatformTransactionManager;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-@SpringBootTest(classes = {ExecutionContextTest.TestConfig.class, CourseUtilBatchTestConfig.class})
-class ExecutionContextTest {
+@SpringBootTest(classes = {ChunkTest.TestConfig.class, CourseUtilBatchTestConfig.class})
+class ChunkTest {
 
     @Autowired
     private JobLauncherTestUtils jobLauncherTestUtils;
 
     @Test
+    @Disabled
     void runJob() throws Exception {
         JobParameters jobParameters = new JobParametersBuilder()
-                .addParameter("outputText", new JobParameter("Hello Spring Batch"))
-                .addParameter("inputPath", new JobParameter("classpath:files/input.json"))
+                .addParameter("inputPath", new JobParameter("classpath:files/_A/chunkTest.json"))
                 .toJobParameters();
 
         JobExecution jobExecution = jobLauncherTestUtils.launchJob(jobParameters);
@@ -56,7 +57,7 @@ class ExecutionContextTest {
         private JobRepository jobRepository;
 
         @Autowired
-        private PlatformTransactionManager transactionManager;
+        private StepBuilderFactory stepBuilderFactory;
 
 
         @Bean
@@ -68,11 +69,9 @@ class ExecutionContextTest {
 
         @Bean
         public Step step() {
-            SimpleStepBuilder<InputData, OutputData> chunk = new StepBuilder("jsonItemReader")
+            SimpleStepBuilder<InputData, OutputData> chunk = stepBuilderFactory.get("jsonItemReader")
                     .repository(jobRepository)
-                    .transactionManager(transactionManager)
-                    .chunk(1);
-
+                    .chunk(4);
             return chunk.reader(jsonItemReader(null))
                     .processor(processor())
                     .writer(writer())
@@ -83,6 +82,9 @@ class ExecutionContextTest {
         public ItemProcessor<InputData, OutputData> processor() {
             return item -> {
                 OutputData outputData = new OutputData();
+                if (item.value.equals("Six")) {
+                    throw new RuntimeException("Simulate error");
+                }
                 outputData.value = item.value.toUpperCase();
                 return outputData;
             };
@@ -92,7 +94,6 @@ class ExecutionContextTest {
         @StepScope
         public JsonItemReader<InputData> jsonItemReader(@Value("#{jobParameters['inputPath']}") String inputPath) {
             Resource inputResource = CourseUtils.getFileResource(inputPath);
-
             return new JsonItemReaderBuilder<InputData>()
                     .jsonObjectReader(new JacksonJsonObjectReader<>(InputData.class))
                     .resource(inputResource)

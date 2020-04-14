@@ -21,7 +21,7 @@ class HelloWorldTest {
     private JobLauncherTestUtils jobLauncherTestUtils;
 
     @Test
-    @Disabled
+
     void runJob() throws Exception {
         jobLauncherTestUtils.launchJob();
     }
