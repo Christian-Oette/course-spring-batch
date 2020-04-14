@@ -1,4 +1,4 @@
-package com.christianoette._A_the_basics;
+package com.christianoette._A_the_basics._01_hello_world_application;
 
 import org.springframework.batch.core.JobExecutionException;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
@@ -10,17 +10,14 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.PropertySource;
 
 @EnableAutoConfiguration
-@ComponentScan(value = Chapter1Application.SCAN)
-@EntityScan(value = Chapter1Application.SCAN)
+@ComponentScan(basePackageClasses = Application.class)
+@EntityScan(basePackageClasses = Application.class)
 @EnableBatchProcessing
 @PropertySource("/context/without-web-context.properties")
-public class Chapter1Application {
-
-	private static final String CHAPTER = "_A";
-	static final String SCAN = "com.christianoette."+CHAPTER;
+public class Application {
 
 	public static void main(String[] args) throws JobExecutionException, InterruptedException {
-		ConfigurableApplicationContext appContext = SpringApplication.run(Chapter1Application.class, args);
+		ConfigurableApplicationContext appContext = SpringApplication.run(Application.class, args);
 
 		TriggerJobService triggerJobService = appContext.getBean(TriggerJobService.class);
 		triggerJobService.runJobs();
