@@ -1,4 +1,4 @@
-package com.christianoette.chapter2;
+package com.christianoette._A_the_basics._02_read_write_process;
 
 import com.christianoette.testutils.CourseUtilBatchTestConfig;
 import com.christianoette.utils.CourseUtils;
@@ -64,7 +64,7 @@ class ItemWriterTest {
 
         @Bean
         public Step step() {
-            SimpleStepBuilder<InAndOutData, InAndOutData> chunk = new StepBuilder("reader")
+            SimpleStepBuilder<InAndOutData, InAndOutData> chunk = new StepBuilder("jsonItemReader")
                     .repository(jobRepository)
                     .transactionManager(transactionManager)
                     .chunk(1);

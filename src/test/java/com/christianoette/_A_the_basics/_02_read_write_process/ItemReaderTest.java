@@ -1,4 +1,4 @@
-package com.christianoette.chapter2;
+package com.christianoette._A_the_basics._02_read_write_process;
 
 import com.christianoette.testutils.CourseUtilBatchTestConfig;
 import org.junit.jupiter.api.Test;
@@ -58,7 +58,7 @@ class ItemReaderTest {
 
         @Bean
         public Step step() {
-            return stepBuilderFactory.get("reader")
+            return stepBuilderFactory.get("jsonItemReader")
                     .chunk(1)
                     .reader(reader())
                     .writer(new ItemWriter<Object>() {

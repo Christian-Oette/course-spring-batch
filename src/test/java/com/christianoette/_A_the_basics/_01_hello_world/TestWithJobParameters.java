@@ -1,7 +1,6 @@
-package com.christianoette.chapter3;
+package com.christianoette._A_the_basics._01_hello_world;
 
 import com.christianoette.testutils.CourseUtilBatchTestConfig;
-import com.christianoette.utils.CourseUtilJobSummaryListener;
 import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.*;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
@@ -17,10 +16,11 @@ import org.springframework.context.annotation.Configuration;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-@SpringBootTest(classes = {JobExecutionTest.TestConfig.class, CourseUtilBatchTestConfig.class})
-class JobExecutionTest {
+@SpringBootTest(classes = {TestWithJobParameters.TestConfig.class, CourseUtilBatchTestConfig.class})
+class TestWithJobParameters {
 
     @Autowired
+    @JobScope
     private JobLauncherTestUtils jobLauncherTestUtils;
 
     @Test
@@ -28,6 +28,7 @@ class JobExecutionTest {
         JobParameters jobParameters = new JobParametersBuilder()
                 .addParameter("outputText", new JobParameter("Hello Spring Batch"))
                 .toJobParameters();
+
         JobExecution jobExecution = jobLauncherTestUtils.launchJob(jobParameters);
         assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());
     }
@@ -44,11 +45,9 @@ class JobExecutionTest {
 
         @Bean
         public Job job() {
-            Job myJob = jobBuilderFactory.get("myJob")
+            return jobBuilderFactory.get("myJob")
                     .start(step(null))
-                    .listener(new CourseUtilJobSummaryListener())
                     .build();
-            return myJob;
         }
 
         @Bean

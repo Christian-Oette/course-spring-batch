@@ -1,4 +1,4 @@
-package com.christianoette.chapter1;
+package com.christianoette._A_the_basics._01_hello_world;
 
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;

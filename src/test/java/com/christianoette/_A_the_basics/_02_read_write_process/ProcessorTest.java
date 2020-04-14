@@ -1,4 +1,4 @@
-package com.christianoette.chapter2;
+package com.christianoette._A_the_basics._02_read_write_process;
 
 import com.christianoette.testutils.CourseUtilBatchTestConfig;
 import com.christianoette.utils.CourseUtils;
@@ -15,7 +15,6 @@ import org.springframework.batch.item.json.JsonFileItemWriter;
 import org.springframework.batch.item.json.JsonItemReader;
 import org.springframework.batch.item.json.builder.JsonFileItemWriterBuilder;
 import org.springframework.batch.item.json.builder.JsonItemReaderBuilder;
-import org.springframework.batch.item.support.PassThroughItemProcessor;
 import org.springframework.batch.test.JobLauncherTestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -66,7 +65,7 @@ class ProcessorTest {
 
         @Bean
         public Step step() {
-            SimpleStepBuilder<InputData, OutputData> chunk = new StepBuilder("reader")
+            SimpleStepBuilder<InputData, OutputData> chunk = new StepBuilder("jsonItemReader")
                     .repository(jobRepository)
                     .transactionManager(transactionManager)
                     .chunk(1);
