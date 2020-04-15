@@ -39,5 +39,8 @@
                 - RollbackCount: ${stepExecution.rollbackCount!""}
         </#list> <#--Red Color macro--> <@fg 1 />
         Errors:
+        <#list jobExecution.allFailureExceptions as failureException>
+            - ${failureException}
+        </#list>
 
 </#if>

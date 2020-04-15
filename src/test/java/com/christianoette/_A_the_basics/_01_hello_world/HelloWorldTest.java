@@ -1,6 +1,6 @@
 package com.christianoette._A_the_basics._01_hello_world;
 
-import org.junit.jupiter.api.Disabled;
+
 import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
@@ -21,7 +21,6 @@ class HelloWorldTest {
     private JobLauncherTestUtils jobLauncherTestUtils;
 
     @Test
-
     void runJob() throws Exception {
         jobLauncherTestUtils.launchJob();
     }

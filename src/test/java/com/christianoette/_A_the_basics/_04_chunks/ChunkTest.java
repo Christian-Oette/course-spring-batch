@@ -1,8 +1,7 @@
-package com.christianoette._A_the_basics._05_chunks;
+package com.christianoette._A_the_basics._04_chunks;
 
 import com.christianoette.testutils.CourseUtilBatchTestConfig;
 import com.christianoette.utils.CourseUtils;
-import org.hibernate.validator.internal.IgnoreForbiddenApisErrors;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.*;
