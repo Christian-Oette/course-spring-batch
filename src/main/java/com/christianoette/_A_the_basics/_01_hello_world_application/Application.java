@@ -16,11 +16,8 @@ import org.springframework.context.annotation.PropertySource;
 @PropertySource("/context/without-web-context.properties")
 public class Application {
 
-	public static void main(String[] args) throws JobExecutionException, InterruptedException {
+	public static void main(String[] args) {
 		ConfigurableApplicationContext appContext = SpringApplication.run(Application.class, args);
-
-		TriggerJobService triggerJobService = appContext.getBean(TriggerJobService.class);
-		triggerJobService.runJobs();
 	}
 
 }
