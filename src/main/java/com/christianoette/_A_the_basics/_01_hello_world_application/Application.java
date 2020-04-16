@@ -20,7 +20,7 @@ import org.springframework.context.annotation.PropertySource;
 @PropertySource("/context/without-web-context.properties")
 public class Application {
 
-	public static void main(String[] args) throws JobParametersInvalidException, JobExecutionAlreadyRunningException, JobRestartException, JobInstanceAlreadyCompleteException, InterruptedException {
+	public static void main(String[] args) throws InterruptedException, JobParametersInvalidException, JobExecutionAlreadyRunningException, JobRestartException, JobInstanceAlreadyCompleteException {
 		ConfigurableApplicationContext appContext =
 				SpringApplication.run(Application.class, args);
 
