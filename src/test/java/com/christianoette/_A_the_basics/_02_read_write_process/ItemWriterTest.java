@@ -24,6 +24,10 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.util.ResourceUtils;
+
+import java.io.File;
+import java.io.FileNotFoundException;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -55,50 +59,40 @@ class ItemWriterTest {
         @Bean
         public Job job() {
             return jobBuilderFactory.get("myJob")
-                    .start(step())
+                    .start(readerStep())
                     .build();
         }
 
         @Bean
-        public Step step() {
-            SimpleStepBuilder<InAndOutData, InAndOutData> chunk =
-                    stepBuilderFactory.get("jsonItemReader")
-                    .chunk(1);
-
-            return chunk.reader(reader())
-                    .processor(new PassThroughItemProcessor<>())
-                    .writer(writer())
-                    .build();
+        public Step readerStep() {
+            return stepBuilderFactory.get("readJsonStep")
+                    .chunk(1)
+                    .reader(reader())
+                    .writer(System.out::println).build();
         }
 
         @Bean
-        public JsonItemReader<InAndOutData> reader() {
-            Resource inputResource = CourseUtils.getFileResource("classpath:files/_A/input.json");
+        public JsonItemReader<Input> reader() {
+            File file;
+            try {
+                file = ResourceUtils.getFile("classpath:files/_A/input.json");
+            } catch (FileNotFoundException ex) {
+                throw new IllegalArgumentException(ex);
+            }
 
-            return new JsonItemReaderBuilder<InAndOutData>()
-                    .jsonObjectReader(new JacksonJsonObjectReader<>(InAndOutData.class))
-                    .resource(inputResource)
+            return new JsonItemReaderBuilder<Input>()
+                    .jsonObjectReader(new JacksonJsonObjectReader<>(Input.class))
+                    .resource(new FileSystemResource(file))
                     .name("jsonItemReader")
                     .build();
         }
 
-        @Bean
-        public JsonFileItemWriter<InAndOutData> writer() {
-            Resource outputResource = new FileSystemResource("output/output.json");
-
-            return new JsonFileItemWriterBuilder<InAndOutData>()
-                    .jsonObjectMarshaller(new JacksonJsonObjectMarshaller<>())
-                    .resource(outputResource)
-                    .name("jsonItemWriter")
-                    .build();
-        }
-
-        public static class InAndOutData {
+        public static class Input {
             public String value;
 
             @Override
             public String toString() {
-                return "Data{" +
+                return "Input{" +
                         "value='" + value + '\'' +
                         '}';
             }

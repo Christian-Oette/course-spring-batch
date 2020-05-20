@@ -46,8 +46,6 @@ class ItemReaderTest {
                     .start((Step)null /*define your step here*/)
                     .build();
         }
-
-
     }
 
 }
