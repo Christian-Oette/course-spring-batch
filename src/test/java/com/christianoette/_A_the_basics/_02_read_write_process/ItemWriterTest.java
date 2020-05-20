@@ -5,6 +5,7 @@ import com.christianoette.utils.CourseUtils;
 import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.*;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
+import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.builder.SimpleStepBuilder;
 import org.springframework.batch.core.step.builder.StepBuilder;
@@ -35,7 +36,6 @@ class ItemWriterTest {
     @Test
     void runJob() throws Exception {
         JobParameters jobParameters = new JobParametersBuilder()
-                .addParameter("outputText", new JobParameter("Hello Spring Batch"))
                 .toJobParameters();
 
         JobExecution jobExecution = jobLauncherTestUtils.launchJob(jobParameters);
@@ -50,10 +50,7 @@ class ItemWriterTest {
         private JobBuilderFactory jobBuilderFactory;
 
         @Autowired
-        private JobRepository jobRepository;
-
-        @Autowired
-        private PlatformTransactionManager transactionManager;
+        private StepBuilderFactory stepBuilderFactory;
 
         @Bean
         public Job job() {
@@ -64,9 +61,8 @@ class ItemWriterTest {
 
         @Bean
         public Step step() {
-            SimpleStepBuilder<InAndOutData, InAndOutData> chunk = new StepBuilder("jsonItemReader")
-                    .repository(jobRepository)
-                    .transactionManager(transactionManager)
+            SimpleStepBuilder<InAndOutData, InAndOutData> chunk =
+                    stepBuilderFactory.get("jsonItemReader")
                     .chunk(1);
 
             return chunk.reader(reader())
@@ -82,7 +78,7 @@ class ItemWriterTest {
             return new JsonItemReaderBuilder<InAndOutData>()
                     .jsonObjectReader(new JacksonJsonObjectReader<>(InAndOutData.class))
                     .resource(inputResource)
-                    .name("tradeJsonItemReader")
+                    .name("jsonItemReader")
                     .build();
         }
 
@@ -93,7 +89,7 @@ class ItemWriterTest {
             return new JsonFileItemWriterBuilder<InAndOutData>()
                     .jsonObjectMarshaller(new JacksonJsonObjectMarshaller<>())
                     .resource(outputResource)
-                    .name("tradeJsonItemReader")
+                    .name("jsonItemWriter")
                     .build();
         }
 
