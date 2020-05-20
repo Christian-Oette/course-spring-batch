@@ -5,6 +5,7 @@ import com.christianoette.utils.CourseUtils;
 import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.*;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
+import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.builder.SimpleStepBuilder;
 import org.springframework.batch.core.step.builder.StepBuilder;
@@ -23,6 +24,10 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.util.ResourceUtils;
+
+import java.io.File;
+import java.io.FileNotFoundException;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -35,7 +40,6 @@ class ItemWriterTest {
     @Test
     void runJob() throws Exception {
         JobParameters jobParameters = new JobParametersBuilder()
-                .addParameter("outputText", new JobParameter("Hello Spring Batch"))
                 .toJobParameters();
 
         JobExecution jobExecution = jobLauncherTestUtils.launchJob(jobParameters);
@@ -50,59 +54,45 @@ class ItemWriterTest {
         private JobBuilderFactory jobBuilderFactory;
 
         @Autowired
-        private JobRepository jobRepository;
-
-        @Autowired
-        private PlatformTransactionManager transactionManager;
+        private StepBuilderFactory stepBuilderFactory;
 
         @Bean
         public Job job() {
             return jobBuilderFactory.get("myJob")
-                    .start(step())
+                    .start(readerStep())
                     .build();
         }
 
         @Bean
-        public Step step() {
-            SimpleStepBuilder<InAndOutData, InAndOutData> chunk = new StepBuilder("jsonItemReader")
-                    .repository(jobRepository)
-                    .transactionManager(transactionManager)
-                    .chunk(1);
-
-            return chunk.reader(reader())
-                    .processor(new PassThroughItemProcessor<>())
-                    .writer(writer())
-                    .build();
+        public Step readerStep() {
+            return stepBuilderFactory.get("readJsonStep")
+                    .chunk(1)
+                    .reader(reader())
+                    .writer(System.out::println).build();
         }
 
         @Bean
-        public JsonItemReader<InAndOutData> reader() {
-            Resource inputResource = CourseUtils.getFileResource("classpath:files/_A/input.json");
+        public JsonItemReader<Input> reader() {
+            File file;
+            try {
+                file = ResourceUtils.getFile("classpath:files/_A/input.json");
+            } catch (FileNotFoundException ex) {
+                throw new IllegalArgumentException(ex);
+            }
 
-            return new JsonItemReaderBuilder<InAndOutData>()
-                    .jsonObjectReader(new JacksonJsonObjectReader<>(InAndOutData.class))
-                    .resource(inputResource)
-                    .name("tradeJsonItemReader")
+            return new JsonItemReaderBuilder<Input>()
+                    .jsonObjectReader(new JacksonJsonObjectReader<>(Input.class))
+                    .resource(new FileSystemResource(file))
+                    .name("jsonItemReader")
                     .build();
         }
 
-        @Bean
-        public JsonFileItemWriter<InAndOutData> writer() {
-            Resource outputResource = new FileSystemResource("output/output.json");
-
-            return new JsonFileItemWriterBuilder<InAndOutData>()
-                    .jsonObjectMarshaller(new JacksonJsonObjectMarshaller<>())
-                    .resource(outputResource)
-                    .name("tradeJsonItemReader")
-                    .build();
-        }
-
-        public static class InAndOutData {
+        public static class Input {
             public String value;
 
             @Override
             public String toString() {
-                return "Data{" +
+                return "Input{" +
                         "value='" + value + '\'' +
                         '}';
             }
