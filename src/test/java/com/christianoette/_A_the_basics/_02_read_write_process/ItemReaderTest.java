@@ -82,7 +82,7 @@ class ItemReaderTest {
 
             @Override
             public String toString() {
-                return "Input{" +
+                return "InputAndOutputData{" +
                         "value='" + value + '\'' +
                         '}';
             }
