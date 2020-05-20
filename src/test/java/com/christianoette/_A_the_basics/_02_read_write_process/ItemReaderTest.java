@@ -1,6 +1,7 @@
 package com.christianoette._A_the_basics._02_read_write_process;
 
 import com.christianoette.testutils.CourseUtilBatchTestConfig;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.*;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
@@ -30,16 +31,16 @@ class ItemReaderTest {
     private JobLauncherTestUtils jobLauncherTestUtils;
 
     @Test
+    @Disabled(value = "Reader step not yet implemented")
     void runJob() throws Exception {
-        JobParameters jobParameters = new JobParametersBuilder()
-                .addParameter("outputText", new JobParameter("Hello Spring Batch"))
+        JobParameters emptyJobParameters = new JobParametersBuilder()
                 .toJobParameters();
 
-        JobExecution jobExecution = jobLauncherTestUtils.launchJob(jobParameters);
+        JobExecution jobExecution = jobLauncherTestUtils.launchJob(emptyJobParameters);
         assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());
     }
 
-    @SuppressWarnings("WeakerAccess")
+    @SuppressWarnings({"WeakerAccess", "SpringJavaInjectionPointsAutowiringInspection"})
     @Configuration
     static class TestConfig {
 
@@ -52,50 +53,11 @@ class ItemReaderTest {
         @Bean
         public Job job() {
             return jobBuilderFactory.get("myJob")
-                    .start(step())
+                    .start((Step)null /*define your step here*/)
                     .build();
         }
 
-        @Bean
-        public Step step() {
-            return stepBuilderFactory.get("jsonItemReader")
-                    .chunk(1)
-                    .reader(reader())
-                    .writer(new ItemWriter<Object>() {
-                        @Override
-                        public void write(List<?> items) throws Exception {
-                            System.out.println(items);
-                        }
-                    })
-                    .build();
-        }
 
-        @Bean
-        public JsonItemReader<Input> reader() {
-            File file = null;
-            try {
-                file = ResourceUtils.getFile("classpath:files/_A/input.json");
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
-            }
-
-            return new JsonItemReaderBuilder<Input>()
-                    .jsonObjectReader(new JacksonJsonObjectReader<>(Input.class))
-                    .resource(new FileSystemResource(file))
-                    .name("tradeJsonItemReader")
-                    .build();
-        }
-
-        public static class Input {
-            public String value;
-
-            @Override
-            public String toString() {
-                return "Data{" +
-                        "value='" + value + '\'' +
-                        '}';
-            }
-        }
     }
 
 }
