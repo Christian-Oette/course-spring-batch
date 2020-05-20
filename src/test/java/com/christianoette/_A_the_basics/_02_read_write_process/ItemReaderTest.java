@@ -31,7 +31,6 @@ class ItemReaderTest {
     private JobLauncherTestUtils jobLauncherTestUtils;
 
     @Test
-    @Disabled(value = "Reader step not yet implemented")
     void runJob() throws Exception {
         JobParameters emptyJobParameters = new JobParametersBuilder()
                 .toJobParameters();
@@ -53,11 +52,44 @@ class ItemReaderTest {
         @Bean
         public Job job() {
             return jobBuilderFactory.get("myJob")
-                    .start((Step)null /*define your step here*/)
+                    .start(readerStep())
                     .build();
         }
 
+        @Bean
+        public Step readerStep() {
+            return stepBuilderFactory.get("readJsonStep")
+                    .chunk(1)
+                    .reader(reader())
+                    .writer(System.out::println).build();
+        }
 
+        @Bean
+        public JsonItemReader<Input> reader() {
+            File file;
+            try {
+                file = ResourceUtils.getFile("classpath:files/_A/input.json");
+            } catch (FileNotFoundException ex) {
+                throw new IllegalArgumentException(ex);
+            }
+
+            return new JsonItemReaderBuilder<Input>()
+                    .jsonObjectReader(new JacksonJsonObjectReader<>(Input.class))
+                    .resource(new FileSystemResource(file))
+                    .name("jsonItemReader")
+                    .build();
+        }
+
+        public static class Input {
+            public String value;
+
+            @Override
+            public String toString() {
+                return "Input{" +
+                        "value='" + value + '\'' +
+                        '}';
+            }
+        }
     }
 
 }
