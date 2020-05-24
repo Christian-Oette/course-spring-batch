@@ -41,6 +41,8 @@ class StepScopeTest {
     @Test
     void runJob() throws Exception {
         JobParameters jobParameters = new JobParametersBuilder()
+                .addParameter("inputPath", new JobParameter("classpath:files/_A/input.json"))
+                .addParameter("outputPath", new JobParameter("output/myOutput.json"))
                 .toJobParameters();
 
         JobExecution jobExecution = jobLauncherTestUtils.launchJob(jobParameters);
@@ -70,9 +72,9 @@ class StepScopeTest {
                     = stepBuilderFactory.get("readJsonStep")
                     .chunk(1);
 
-            return simpleStepBuilder.reader(reader())
+            return simpleStepBuilder.reader(reader(null))
                     .processor(processor())
-                    .writer(writer()).build();
+                    .writer(writer(null)).build();
         }
 
         private ItemProcessor<InputData, OutputData> processor() {
@@ -84,10 +86,11 @@ class StepScopeTest {
         }
 
         @Bean
-        public JsonItemReader<InputData> reader() {
+        @StepScope
+        public JsonItemReader<InputData> reader(@Value("#{jobParameters['inputPath']}") String inputPath) {
             File file;
             try {
-                file = ResourceUtils.getFile("classpath:files/_A/input.json");
+                file = ResourceUtils.getFile(inputPath);
             } catch (FileNotFoundException ex) {
                 throw new IllegalArgumentException(ex);
             }
@@ -99,8 +102,9 @@ class StepScopeTest {
         }
 
         @Bean
-        public JsonFileItemWriter<OutputData> writer() {
-            Resource outputResource = new FileSystemResource("output/output.json");
+        @StepScope
+        public JsonFileItemWriter<OutputData> writer(@Value("#{jobParameters['outputPath']}")String outputPath) {
+            Resource outputResource = new FileSystemResource(outputPath);
 
             return new JsonFileItemWriterBuilder<OutputData>()
                     .jsonObjectMarshaller(new JacksonJsonObjectMarshaller<>())
