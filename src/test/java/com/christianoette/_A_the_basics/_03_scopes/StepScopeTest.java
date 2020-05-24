@@ -25,6 +25,10 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
+import org.springframework.util.ResourceUtils;
+
+import java.io.File;
+import java.io.FileNotFoundException;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -37,8 +41,6 @@ class StepScopeTest {
     @Test
     void runJob() throws Exception {
         JobParameters jobParameters = new JobParametersBuilder()
-                .addParameter("outputText", new JobParameter("Hello Spring Batch"))
-                .addParameter("inputPath", new JobParameter("classpath:files/_A/input.json"))
                 .toJobParameters();
 
         JobExecution jobExecution = jobLauncherTestUtils.launchJob(jobParameters);
@@ -53,47 +55,46 @@ class StepScopeTest {
         private JobBuilderFactory jobBuilderFactory;
 
         @Autowired
-        private JobRepository jobRepository;
-
-        @Autowired
         private StepBuilderFactory stepBuilderFactory;
-
 
         @Bean
         public Job job() {
             return jobBuilderFactory.get("myJob")
-                    .start(step())
+                    .start(readerStep())
                     .build();
         }
 
         @Bean
-        public Step step() {
-            SimpleStepBuilder<InputData, OutputData> chunk = stepBuilderFactory.get("jsonItemReader")
-                    .repository(jobRepository)
+        public Step readerStep() {
+            SimpleStepBuilder<InputData, OutputData> simpleStepBuilder
+                    = stepBuilderFactory.get("readJsonStep")
                     .chunk(1);
-            return chunk.reader(jsonItemReader(null))
+
+            return simpleStepBuilder.reader(reader())
                     .processor(processor())
-                    .writer(writer())
-                    .build();
+                    .writer(writer()).build();
         }
 
-        @Bean
-        public ItemProcessor<InputData, OutputData> processor() {
-            return item -> {
+        private ItemProcessor<InputData, OutputData> processor() {
+            return inputData -> {
                 OutputData outputData = new OutputData();
-                outputData.value = item.value.toUpperCase();
+                outputData.outputValue = inputData.value.toUpperCase();
                 return outputData;
             };
         }
 
         @Bean
-        @StepScope
-        public JsonItemReader<InputData> jsonItemReader(@Value("#{jobParameters['inputPath']}") String inputPath) {
-            Resource inputResource = CourseUtils.getFileResource(inputPath);
+        public JsonItemReader<InputData> reader() {
+            File file;
+            try {
+                file = ResourceUtils.getFile("classpath:files/_A/input.json");
+            } catch (FileNotFoundException ex) {
+                throw new IllegalArgumentException(ex);
+            }
             return new JsonItemReaderBuilder<InputData>()
                     .jsonObjectReader(new JacksonJsonObjectReader<>(InputData.class))
-                    .resource(inputResource)
-                    .name("tradeJsonItemReader")
+                    .resource(new FileSystemResource(file))
+                    .name("jsonItemReader")
                     .build();
         }
 
@@ -104,7 +105,7 @@ class StepScopeTest {
             return new JsonFileItemWriterBuilder<OutputData>()
                     .jsonObjectMarshaller(new JacksonJsonObjectMarshaller<>())
                     .resource(outputResource)
-                    .name("tradeJsonItemReader")
+                    .name("jsonItemWriter")
                     .build();
         }
 
@@ -113,19 +114,19 @@ class StepScopeTest {
 
             @Override
             public String toString() {
-                return "Data{" +
+                return "InputData{" +
                         "value='" + value + '\'' +
                         '}';
             }
         }
 
         public static class OutputData {
-            public String value;
+            public String outputValue;
 
             @Override
             public String toString() {
-                return "Data{" +
-                        "value='" + value + '\'' +
+                return "OutputData{" +
+                        "outputValue='" + outputValue + '\'' +
                         '}';
             }
         }
