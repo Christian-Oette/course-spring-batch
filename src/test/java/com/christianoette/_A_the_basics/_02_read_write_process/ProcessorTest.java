@@ -66,17 +66,25 @@ class ProcessorTest {
 
         @Bean
         public Step readerStep() {
-            SimpleStepBuilder<InputAndOutputData, InputAndOutputData> simpleStepBuilder
+            SimpleStepBuilder<InputData, OutputData> simpleStepBuilder
                     = stepBuilderFactory.get("readJsonStep")
                     .chunk(1);
 
             return simpleStepBuilder.reader(reader())
-                    .processor(new PassThroughItemProcessor<>())
+                    .processor(processor())
                     .writer(writer()).build();
         }
 
+        private ItemProcessor<InputData, OutputData> processor() {
+            return inputData -> {
+                OutputData outputData = new OutputData();
+                outputData.outputValue = inputData.value.toUpperCase();
+                return outputData;
+            };
+        }
+
         @Bean
-        public JsonItemReader<InputAndOutputData> reader() {
+        public JsonItemReader<InputData> reader() {
             File file;
             try {
                 file = ResourceUtils.getFile("classpath:files/_A/input.json");
@@ -84,31 +92,42 @@ class ProcessorTest {
                 throw new IllegalArgumentException(ex);
             }
 
-            return new JsonItemReaderBuilder<InputAndOutputData>()
-                    .jsonObjectReader(new JacksonJsonObjectReader<>(InputAndOutputData.class))
+            return new JsonItemReaderBuilder<InputData>()
+                    .jsonObjectReader(new JacksonJsonObjectReader<>(InputData.class))
                     .resource(new FileSystemResource(file))
                     .name("jsonItemReader")
                     .build();
         }
 
         @Bean
-        public JsonFileItemWriter<InputAndOutputData> writer() {
+        public JsonFileItemWriter<OutputData> writer() {
             Resource outputResource = new FileSystemResource("output/output.json");
 
-            return new JsonFileItemWriterBuilder<InputAndOutputData>()
+            return new JsonFileItemWriterBuilder<OutputData>()
                     .jsonObjectMarshaller(new JacksonJsonObjectMarshaller<>())
                     .resource(outputResource)
                     .name("jsonItemWriter")
                     .build();
         }
 
-        public static class InputAndOutputData {
+        public static class InputData {
             public String value;
 
             @Override
             public String toString() {
-                return "InputAndOutputData{" +
+                return "InputData{" +
                         "value='" + value + '\'' +
+                        '}';
+            }
+        }
+
+        public static class OutputData {
+            public String outputValue;
+
+            @Override
+            public String toString() {
+                return "OutputData{" +
+                        "outputValue='" + outputValue + '\'' +
                         '}';
             }
         }

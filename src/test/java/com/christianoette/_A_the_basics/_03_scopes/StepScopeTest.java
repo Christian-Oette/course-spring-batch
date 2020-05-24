@@ -37,7 +37,6 @@ class StepScopeTest {
     @Test
     void runJob() throws Exception {
         JobParameters jobParameters = new JobParametersBuilder()
-                .addParameter("outputText", new JobParameter("Hello Spring Batch"))
                 .addParameter("inputPath", new JobParameter("classpath:files/_A/input.json"))
                 .toJobParameters();
 
