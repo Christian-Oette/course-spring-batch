@@ -5,6 +5,7 @@ import com.christianoette.utils.CourseUtils;
 import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.*;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
+import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.builder.SimpleStepBuilder;
 import org.springframework.batch.core.step.builder.StepBuilder;
@@ -15,6 +16,7 @@ import org.springframework.batch.item.json.JsonFileItemWriter;
 import org.springframework.batch.item.json.JsonItemReader;
 import org.springframework.batch.item.json.builder.JsonFileItemWriterBuilder;
 import org.springframework.batch.item.json.builder.JsonItemReaderBuilder;
+import org.springframework.batch.item.support.PassThroughItemProcessor;
 import org.springframework.batch.test.JobLauncherTestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -23,6 +25,10 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.util.ResourceUtils;
+
+import java.io.File;
+import java.io.FileNotFoundException;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -35,7 +41,6 @@ class ProcessorTest {
     @Test
     void runJob() throws Exception {
         JobParameters jobParameters = new JobParametersBuilder()
-                .addParameter("outputText", new JobParameter("Hello Spring Batch"))
                 .toJobParameters();
 
         JobExecution jobExecution = jobLauncherTestUtils.launchJob(jobParameters);
@@ -50,84 +55,62 @@ class ProcessorTest {
         private JobBuilderFactory jobBuilderFactory;
 
         @Autowired
-        private JobRepository jobRepository;
-
-        @Autowired
-        private PlatformTransactionManager transactionManager;
-
+        private StepBuilderFactory stepBuilderFactory;
 
         @Bean
         public Job job() {
             return jobBuilderFactory.get("myJob")
-                    .start(step())
+                    .start(readerStep())
                     .build();
         }
 
         @Bean
-        public Step step() {
-            SimpleStepBuilder<InputData, OutputData> chunk = new StepBuilder("jsonItemReader")
-                    .repository(jobRepository)
-                    .transactionManager(transactionManager)
+        public Step readerStep() {
+            SimpleStepBuilder<InputAndOutputData, InputAndOutputData> simpleStepBuilder
+                    = stepBuilderFactory.get("readJsonStep")
                     .chunk(1);
 
-            return chunk.reader(reader())
-                    .processor(processor())
-                    .writer(writer())
+            return simpleStepBuilder.reader(reader())
+                    .processor(new PassThroughItemProcessor<>())
+                    .writer(writer()).build();
+        }
+
+        @Bean
+        public JsonItemReader<InputAndOutputData> reader() {
+            File file;
+            try {
+                file = ResourceUtils.getFile("classpath:files/_A/input.json");
+            } catch (FileNotFoundException ex) {
+                throw new IllegalArgumentException(ex);
+            }
+
+            return new JsonItemReaderBuilder<InputAndOutputData>()
+                    .jsonObjectReader(new JacksonJsonObjectReader<>(InputAndOutputData.class))
+                    .resource(new FileSystemResource(file))
+                    .name("jsonItemReader")
                     .build();
         }
 
         @Bean
-        public ItemProcessor<InputData, OutputData> processor() {
-            return item -> {
-                OutputData outputData = new OutputData();
-                outputData.value = item.value.toUpperCase();
-                return outputData;
-            };
-        }
-
-        @Bean
-        public JsonItemReader<InputData> reader() {
-            Resource inputResource = CourseUtils.getFileResource("classpath:files/_A/input.json");
-
-            return new JsonItemReaderBuilder<InputData>()
-                    .jsonObjectReader(new JacksonJsonObjectReader<>(InputData.class))
-                    .resource(inputResource)
-                    .name("tradeJsonItemReader")
-                    .build();
-        }
-
-        @Bean
-        public JsonFileItemWriter<OutputData> writer() {
+        public JsonFileItemWriter<InputAndOutputData> writer() {
             Resource outputResource = new FileSystemResource("output/output.json");
 
-            return new JsonFileItemWriterBuilder<OutputData>()
+            return new JsonFileItemWriterBuilder<InputAndOutputData>()
                     .jsonObjectMarshaller(new JacksonJsonObjectMarshaller<>())
                     .resource(outputResource)
-                    .name("tradeJsonItemReader")
+                    .name("jsonItemWriter")
                     .build();
         }
 
-        public static class InputData {
+        public static class InputAndOutputData {
             public String value;
 
             @Override
             public String toString() {
-                return "Data{" +
-                        "value='" + value + '\'' +
-                        '}';
-            }
-        }
-
-        public static class OutputData {
-            public String value;
-
-            @Override
-            public String toString() {
-                return "Data{" +
+                return "InputAndOutputData{" +
                         "value='" + value + '\'' +
                         '}';
             }
         }
     }
-
 }
