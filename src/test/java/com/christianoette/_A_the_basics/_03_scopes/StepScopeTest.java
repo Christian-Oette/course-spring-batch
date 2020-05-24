@@ -40,13 +40,24 @@ class StepScopeTest {
 
     @Test
     void runJob() throws Exception {
-        JobParameters jobParameters = new JobParametersBuilder()
-                .addParameter("inputPath", new JobParameter("classpath:files/_A/input.json"))
-                .addParameter("outputPath", new JobParameter("output/myOutput.json"))
-                .toJobParameters();
+        {
+            JobParameters jobParameters = new JobParametersBuilder()
+                    .addParameter("inputPath", new JobParameter("classpath:files/_A/input.json"))
+                    .addParameter("outputPath", new JobParameter("output/myOutput.json"))
+                    .toJobParameters();
 
-        JobExecution jobExecution = jobLauncherTestUtils.launchJob(jobParameters);
-        assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());
+            JobExecution jobExecution = jobLauncherTestUtils.launchJob(jobParameters);
+            assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());
+        }
+        {
+            JobParameters jobParameters = new JobParametersBuilder()
+                    .addParameter("inputPath", new JobParameter("classpath:files/_A/input.json"))
+                    .addParameter("outputPath", new JobParameter("output/myOutput2.json"))
+                    .toJobParameters();
+
+            JobExecution jobExecution = jobLauncherTestUtils.launchJob(jobParameters);
+            assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());
+        }
     }
 
     @SuppressWarnings("WeakerAccess")
