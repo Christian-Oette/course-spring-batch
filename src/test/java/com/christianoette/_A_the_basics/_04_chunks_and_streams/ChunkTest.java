@@ -1,4 +1,4 @@
-package com.christianoette._A_the_basics._04_chunks;
+package com.christianoette._A_the_basics._04_chunks_and_streams;
 
 import com.christianoette.testutils.CourseUtilBatchTestConfig;
 import com.christianoette.utils.CourseUtils;
@@ -39,6 +39,7 @@ class ChunkTest {
     void runJob() throws Exception {
         JobParameters jobParameters = new JobParametersBuilder()
                 .addParameter("inputPath", new JobParameter("classpath:files/_A/chunkTest.json"))
+                .addParameter("outputPath", new JobParameter("output/chunkOutput.json"))
                 .toJobParameters();
 
         JobExecution jobExecution = jobLauncherTestUtils.launchJob(jobParameters);
@@ -68,19 +69,19 @@ class ChunkTest {
 
         @Bean
         public Step step() {
-            SimpleStepBuilder<InputData, OutputData> chunk = stepBuilderFactory.get("jsonItemReader")
+            SimpleStepBuilder<InputData, ChunkTestData> chunk = stepBuilderFactory.get("jsonItemReader")
                     .repository(jobRepository)
                     .chunk(4);
             return chunk.reader(jsonItemReader(null))
                     .processor(processor())
-                    .writer(writer())
+                    .writer(writer(null))
                     .build();
         }
 
         @Bean
-        public ItemProcessor<InputData, OutputData> processor() {
+        public ItemProcessor<InputData, ChunkTestData> processor() {
             return item -> {
-                OutputData outputData = new OutputData();
+                ChunkTestData outputData = new ChunkTestData();
                 if (item.value.equals("Six")) {
                     throw new RuntimeException("Simulate error");
                 }
@@ -96,18 +97,19 @@ class ChunkTest {
             return new JsonItemReaderBuilder<InputData>()
                     .jsonObjectReader(new JacksonJsonObjectReader<>(InputData.class))
                     .resource(inputResource)
-                    .name("tradeJsonItemReader")
+                    .name("jsonItemReader")
                     .build();
         }
 
         @Bean
-        public JsonFileItemWriter<OutputData> writer() {
-            Resource outputResource = new FileSystemResource("output/output.json");
+        @StepScope
+        public JsonFileItemWriter<ChunkTestData> writer(@Value("#{jobParameters['outputPath']}") String outputPath) {
+            Resource outputResource = new FileSystemResource(outputPath);
 
-            return new JsonFileItemWriterBuilder<OutputData>()
+            return new JsonFileItemWriterBuilder<ChunkTestData>()
                     .jsonObjectMarshaller(new JacksonJsonObjectMarshaller<>())
                     .resource(outputResource)
-                    .name("tradeJsonItemReader")
+                    .name("jsonItemWriter")
                     .build();
         }
 
@@ -122,7 +124,7 @@ class ChunkTest {
             }
         }
 
-        public static class OutputData {
+        public static class ChunkTestData {
             public String value;
 
             @Override
