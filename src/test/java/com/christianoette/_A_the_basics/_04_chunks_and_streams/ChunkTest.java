@@ -72,7 +72,7 @@ class ChunkTest {
         public Step step() {
             SimpleStepBuilder<ChunkTestInputData, ChunkTestOutputData> chunk = stepBuilderFactory.get("jsonItemReader")
                     .repository(jobRepository)
-                    .chunk(1);
+                    .chunk(4);
             return chunk.reader(jsonItemReader(null))
                     .processor(processor())
                     .writer(writer(null))
@@ -83,6 +83,9 @@ class ChunkTest {
         public ItemProcessor<ChunkTestInputData, ChunkTestOutputData> processor() {
             return item -> {
                 ChunkTestOutputData outputData = new ChunkTestOutputData();
+                if (item.value.equals("Six")) {
+                    throw new RuntimeException("Simulate error");
+                }
                 outputData.value = item.value.toUpperCase();
                 return outputData;
             };
