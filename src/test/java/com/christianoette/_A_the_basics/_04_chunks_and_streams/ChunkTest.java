@@ -1,6 +1,7 @@
-package com.christianoette._A_the_basics._04_chunks;
+package com.christianoette._A_the_basics._04_chunks_and_streams;
 
 import com.christianoette.testutils.CourseUtilBatchTestConfig;
+import com.christianoette.testutils.CourseUtilsJsonData;
 import com.christianoette.utils.CourseUtils;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -39,6 +40,7 @@ class ChunkTest {
     void runJob() throws Exception {
         JobParameters jobParameters = new JobParametersBuilder()
                 .addParameter("inputPath", new JobParameter("classpath:files/_A/chunkTest.json"))
+                .addParameter("outputPath", new JobParameter("output/chunkOutput.json"))
                 .toJobParameters();
 
         JobExecution jobExecution = jobLauncherTestUtils.launchJob(jobParameters);
@@ -68,22 +70,19 @@ class ChunkTest {
 
         @Bean
         public Step step() {
-            SimpleStepBuilder<InputData, OutputData> chunk = stepBuilderFactory.get("jsonItemReader")
+            SimpleStepBuilder<ChunkTestInputData, ChunkTestOutputData> chunk = stepBuilderFactory.get("jsonItemReader")
                     .repository(jobRepository)
-                    .chunk(4);
+                    .chunk(1);
             return chunk.reader(jsonItemReader(null))
                     .processor(processor())
-                    .writer(writer())
+                    .writer(writer(null))
                     .build();
         }
 
         @Bean
-        public ItemProcessor<InputData, OutputData> processor() {
+        public ItemProcessor<ChunkTestInputData, ChunkTestOutputData> processor() {
             return item -> {
-                OutputData outputData = new OutputData();
-                if (item.value.equals("Six")) {
-                    throw new RuntimeException("Simulate error");
-                }
+                ChunkTestOutputData outputData = new ChunkTestOutputData();
                 outputData.value = item.value.toUpperCase();
                 return outputData;
             };
@@ -91,46 +90,30 @@ class ChunkTest {
 
         @Bean
         @StepScope
-        public JsonItemReader<InputData> jsonItemReader(@Value("#{jobParameters['inputPath']}") String inputPath) {
+        public JsonItemReader<ChunkTestInputData> jsonItemReader(@Value("#{jobParameters['inputPath']}") String inputPath) {
             Resource inputResource = CourseUtils.getFileResource(inputPath);
-            return new JsonItemReaderBuilder<InputData>()
-                    .jsonObjectReader(new JacksonJsonObjectReader<>(InputData.class))
+            return new JsonItemReaderBuilder<ChunkTestInputData>()
+                    .jsonObjectReader(new JacksonJsonObjectReader<>(ChunkTestInputData.class))
                     .resource(inputResource)
-                    .name("tradeJsonItemReader")
+                    .name("jsonItemReader")
                     .build();
         }
 
         @Bean
-        public JsonFileItemWriter<OutputData> writer() {
-            Resource outputResource = new FileSystemResource("output/output.json");
+        @StepScope
+        public JsonFileItemWriter<ChunkTestOutputData> writer(@Value("#{jobParameters['outputPath']}") String outputPath) {
+            Resource outputResource = new FileSystemResource(outputPath);
 
-            return new JsonFileItemWriterBuilder<OutputData>()
+            return new JsonFileItemWriterBuilder<ChunkTestOutputData>()
                     .jsonObjectMarshaller(new JacksonJsonObjectMarshaller<>())
                     .resource(outputResource)
-                    .name("tradeJsonItemReader")
+                    .name("jsonItemWriter")
                     .build();
         }
 
-        public static class InputData {
-            public String value;
-
-            @Override
-            public String toString() {
-                return "Data{" +
-                        "value='" + value + '\'' +
-                        '}';
-            }
+        public static class ChunkTestInputData extends CourseUtilsJsonData {
         }
-
-        public static class OutputData {
-            public String value;
-
-            @Override
-            public String toString() {
-                return "Data{" +
-                        "value='" + value + '\'' +
-                        '}';
-            }
+        public static class ChunkTestOutputData extends CourseUtilsJsonData{
         }
     }
 

@@ -12,7 +12,7 @@
         </layout>
     </appender>
 
-    <logger name="de.oette" level="debug" additivity="false">
+    <logger name="com.christianoette" level="info" additivity="false">
         <appender-ref ref="CONSOLE"/>
     </logger>
 
