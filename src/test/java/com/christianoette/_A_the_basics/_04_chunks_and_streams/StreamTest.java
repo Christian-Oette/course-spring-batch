@@ -81,7 +81,7 @@ class StreamTest {
             te.afterPropertiesSet();
             SimpleStepBuilder<String, String> chunk = stepBuilderFactory.get("jsonItemReader")
                     .repository(jobRepository)
-                    .chunk(2);
+                    .chunk(4);
 
             return chunk
                     .reader(null)
@@ -89,7 +89,8 @@ class StreamTest {
                     .writer(null)
                     .taskExecutor(te)
                     .build();
-        }   
+        }
+
     }
 
 }
