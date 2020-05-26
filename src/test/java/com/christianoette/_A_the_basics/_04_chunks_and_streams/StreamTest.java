@@ -75,10 +75,6 @@ class StreamTest {
 
         @Bean
         public Step step() {
-            ThreadPoolTaskExecutor te = new ThreadPoolTaskExecutor();
-            te.setCorePoolSize(4);
-            te.setMaxPoolSize(4);
-            te.afterPropertiesSet();
             SimpleStepBuilder<String, String> chunk = stepBuilderFactory.get("jsonItemReader")
                     .repository(jobRepository)
                     .chunk(4);
@@ -87,7 +83,6 @@ class StreamTest {
                     .reader(null)
                     .processor(new PassThroughItemProcessor<>())
                     .writer(null)
-                    .taskExecutor(te)
                     .build();
         }
 
