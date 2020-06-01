@@ -22,9 +22,12 @@ public class CourseUtilsDefaultTrigger {
         this.job = job;
     }
 
-    public void runJobs() throws JobExecutionException, InterruptedException {
+    public void runJobs() throws JobExecutionException {
+        runJobs(new JobParameters());
+    }
+
+    public void runJobs(JobParameters jobParams) throws JobExecutionException {
         Objects.requireNonNull(job, "You haven't configured a job yet.");
-        JobParameters jobParams = new JobParameters();
         jobLauncher.run(job, jobParams);
     }
 }
