@@ -35,7 +35,7 @@ class StreamTest {
 
     @Autowired
     private JobLauncherTestUtils jobLauncherTestUtils;
-    private static Deque<String> items = new LinkedList<>(
+    private volatile static Deque<String> items = new LinkedList<>(
             List.of("a", "b", "c", "d", "e", "f", "g", "h", "i", "j"));
 
     private static  String readNextItem() {
@@ -43,7 +43,6 @@ class StreamTest {
     }
 
     @Test
-    @Disabled
     void runJob() throws Exception {
         JobParameters jobParameters = new JobParametersBuilder()
                 .toJobParameters();
@@ -75,15 +74,36 @@ class StreamTest {
 
         @Bean
         public Step step() {
+            ThreadPoolTaskExecutor taskExecutor = new ThreadPoolTaskExecutor();
+            taskExecutor.setCorePoolSize(4);
+            taskExecutor.setMaxPoolSize(4);
+            taskExecutor.afterPropertiesSet();
             SimpleStepBuilder<String, String> chunk = stepBuilderFactory.get("jsonItemReader")
                     .repository(jobRepository)
-                    .chunk(4);
+                    .chunk(2);
 
             return chunk
-                    .reader(null)
+                    .reader(createItemReader())
                     .processor(new PassThroughItemProcessor<>())
-                    .writer(null)
+                    .writer(createItemWriter())
+                    .taskExecutor(taskExecutor)
                     .build();
+        }
+
+        private ItemWriter<? super String> createItemWriter() {
+            return (ItemWriter<String>) items -> {
+                LOGGER.info("Write {}", items);
+                CourseUtils.sleep(200);
+            };
+        }
+
+        private ItemReader<? extends String> createItemReader() {
+            return (ItemReader<String>) () -> {
+                String item = readNextItem();
+                LOGGER.info("Read {}", item);
+                CourseUtils.sleep(1000);
+                return item;
+            };
         }
 
     }
