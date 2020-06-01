@@ -10,9 +10,9 @@ import org.springframework.batch.core.configuration.annotation.StepBuilderFactor
 import org.springframework.batch.core.configuration.annotation.StepScope;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.builder.SimpleStepBuilder;
+import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.json.JacksonJsonObjectMarshaller;
 import org.springframework.batch.item.json.JsonFileItemWriter;
-import org.springframework.batch.item.json.JsonItemReader;
 import org.springframework.batch.item.json.builder.JsonFileItemWriterBuilder;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -27,14 +27,14 @@ public class BatchConfig {
     private final JobBuilderFactory jobBuilderFactory;
     private final JobRepository jobRepository;
     private final StepBuilderFactory stepBuilderFactory;
-    private final JsonItemReader<InputData> myJsonItemReader;
+    private final ItemReader<InputData> myJsonItemReader;
     private final UpperCaseJsonProcessor upperCaseJsonProcessor;
 
 
     public BatchConfig(JobBuilderFactory jobBuilderFactory,
                        JobRepository jobRepository,
                        StepBuilderFactory stepBuilderFactory,
-                       JsonItemReader<InputData> myJsonItemReader,
+                       ItemReader<InputData> myJsonItemReader,
                        UpperCaseJsonProcessor upperCaseJsonProcessor) {
         this.jobBuilderFactory = jobBuilderFactory;
         this.jobRepository = jobRepository;
