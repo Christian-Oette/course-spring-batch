@@ -1,6 +1,7 @@
 package com.christianoette._A_the_basics._04_chunks_and_streams;
 
 import com.christianoette.testutils.CourseUtilBatchTestConfig;
+import com.christianoette.utils.CourseUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.Disabled;
@@ -10,12 +11,20 @@ import org.springframework.batch.core.configuration.annotation.JobBuilderFactory
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.builder.SimpleStepBuilder;
+import org.springframework.batch.item.*;
 import org.springframework.batch.item.support.PassThroughItemProcessor;
 import org.springframework.batch.test.JobLauncherTestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
+
+import java.util.ArrayDeque;
+import java.util.Deque;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -26,6 +35,12 @@ class StreamTest {
 
     @Autowired
     private JobLauncherTestUtils jobLauncherTestUtils;
+    private static Deque<String> items = new LinkedList<>(
+            List.of("a", "b", "c", "d", "e", "f", "g", "h", "i", "j"));
+
+    private static  String readNextItem() {
+        return items.pollFirst();
+    }
 
     @Test
     @Disabled
@@ -70,7 +85,6 @@ class StreamTest {
                     .writer(null)
                     .build();
         }
-
 
     }
 
