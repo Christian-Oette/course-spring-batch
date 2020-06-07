@@ -1,6 +1,8 @@
 package com.christianoette._B_the_data_model._01_job_execution;
 
 import com.christianoette.testutils.CourseUtilBatchTestConfig;
+import com.christianoette.utils.CourseUtilJobSummaryListener;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.*;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
@@ -22,6 +24,7 @@ class JobExecutionTest {
     private JobLauncherTestUtils jobLauncherTestUtils;
 
     @Test
+    @Disabled
     void runJob() throws Exception {
         JobParameters jobParameters = new JobParametersBuilder()
                 .toJobParameters();
@@ -44,6 +47,7 @@ class JobExecutionTest {
             Job myJob = jobBuilderFactory.get("myJob")
                     .start(stepOne())
                     .next(stepTwo())
+                    .listener(new CourseUtilJobSummaryListener())
                     .build();
             return myJob;
         }
@@ -63,7 +67,7 @@ class JobExecutionTest {
         public Step stepTwo() {
             return stepBuilderFactory.get("mySecondStep")
                     .tasklet((stepContribution, chunkContext) -> {
-                        return RepeatStatus.FINISHED;
+                        throw new RuntimeException("Simulate error");
                     })
                     .build();
         }
