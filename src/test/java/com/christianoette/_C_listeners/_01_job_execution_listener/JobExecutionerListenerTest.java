@@ -15,7 +15,9 @@ import org.springframework.context.annotation.Configuration;
 
 import java.util.Map;
 
-@SpringBootTest(classes = JobExecutionerListenerTest.TestConfig.class)
+@SpringBootTest(classes = {JobExecutionerListenerTest.TestConfig.class,
+        JobResultHolder.class,
+        JobListenerAsComponent.class})
 class JobExecutionerListenerTest {
 
     @Autowired
@@ -39,19 +41,29 @@ class JobExecutionerListenerTest {
         @Autowired
         private StepBuilderFactory stepBuilderFactory;
 
+        @Autowired
+        private JobListenerAsComponent jobListenerAsComponent;
+
+        @Autowired
+        private JobResultHolder jobResultHolder;
+
         @Bean
-        public Job helloWorldJob() {
-            Step step = stepBuilderFactory.get("intermediateResult")
+        public Job executionListenerJob() {
+            Step step = stepBuilderFactory.get("executionListenerJob")
                     .tasklet((contribution, chunkContext) -> {
                         Map<String, Object> jobParameters = chunkContext.getStepContext()
                                 .getJobParameters();
                         Object outputText = jobParameters.get("outputText");
                         System.out.println(outputText);
+                        jobResultHolder.result = "GLOBAL-JOB_RESULT";
+
                         return RepeatStatus.FINISHED;
                     }).build();
 
             return jobBuilderFactory.get("helloWorldJob")
                     .start(step)
+                    .listener(new SimpleJobListener())
+                    .listener(jobListenerAsComponent)
                     .build();
         }
 
