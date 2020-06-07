@@ -3,5 +3,8 @@
 Spring Batch Beginner Course
 https://christianoette.com
 
+Latest Documentation
+https://docs.spring.io/spring-batch/docs/current/reference/html/index-single.html
+
 ====================================
 
