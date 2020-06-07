@@ -29,7 +29,7 @@ public class PersistentModelJobConfiguration {
 
     @Bean
     public Job persistentModelJob() {
-        Step step = stepBuilderFactory.get("step1")
+        Step step = stepBuilderFactory.get("step3")
                 .tasklet((contribution, chunkContext) -> {
                     Map<String, Object> jobParameters = chunkContext.getStepContext()
                             .getJobParameters();
@@ -38,7 +38,7 @@ public class PersistentModelJobConfiguration {
                     return RepeatStatus.FINISHED;
                 }).build();
 
-        return jobBuilderFactory.get("helloWorldJob")
+        return jobBuilderFactory.get("helloWorldJob2")
                 .start(step)
                 .build();
     }
