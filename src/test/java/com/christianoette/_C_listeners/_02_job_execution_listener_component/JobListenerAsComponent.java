@@ -1,4 +1,4 @@
-package com.christianoette._C_listeners._01_job_execution_listener;
+package com.christianoette._C_listeners._02_job_execution_listener_component;
 
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobExecutionListener;

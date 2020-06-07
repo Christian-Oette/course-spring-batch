@@ -1,4 +1,4 @@
-package com.christianoette._C_listeners._01_job_execution_listener;
+package com.christianoette._C_listeners._01_job_execution_listener_simple;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
