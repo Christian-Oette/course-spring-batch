@@ -43,7 +43,7 @@ class JobExecutionTest {
         public Job job() {
             Job myJob = jobBuilderFactory.get("myJob")
                     .start(stepOne())
-                    .start(stepTwo())
+                    .next(stepTwo())
                     .build();
             return myJob;
         }
