@@ -1,7 +1,6 @@
 package com.christianoette._B_the_data_model._01_job_execution;
 
 import com.christianoette.testutils.CourseUtilBatchTestConfig;
-import com.christianoette.utils.CourseUtilJobSummaryListener;
 import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.*;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
@@ -44,7 +43,6 @@ class JobExecutionTest {
         public Job job() {
             Job myJob = jobBuilderFactory.get("myJob")
                     .start(step())
-                    .listener(new CourseUtilJobSummaryListener())
                     .build();
             return myJob;
         }
