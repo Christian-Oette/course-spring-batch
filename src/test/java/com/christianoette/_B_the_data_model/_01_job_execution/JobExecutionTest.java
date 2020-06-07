@@ -42,15 +42,26 @@ class JobExecutionTest {
         @Bean
         public Job job() {
             Job myJob = jobBuilderFactory.get("myJob")
-                    .start(step())
+                    .start(stepOne())
+                    .start(stepTwo())
                     .build();
             return myJob;
         }
 
         @Bean
         @JobScope
-        public Step step() {
+        public Step stepOne() {
             return stepBuilderFactory.get("myFirstStep")
+                    .tasklet((stepContribution, chunkContext) -> {
+                        return RepeatStatus.FINISHED;
+                    })
+                    .build();
+        }
+
+        @Bean
+        @JobScope
+        public Step stepTwo() {
+            return stepBuilderFactory.get("mySecondStep")
                     .tasklet((stepContribution, chunkContext) -> {
                         return RepeatStatus.FINISHED;
                     })
