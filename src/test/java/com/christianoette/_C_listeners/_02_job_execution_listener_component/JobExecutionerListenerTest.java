@@ -49,7 +49,7 @@ class JobExecutionerListenerTest {
 
         @Bean
         public Job executionListenerJob() {
-            Step step = stepBuilderFactory.get("executionListenerJob")
+            Step step = stepBuilderFactory.get("annotationListenerTest")
                     .tasklet((contribution, chunkContext) -> {
                         Map<String, Object> jobParameters = chunkContext.getStepContext()
                                 .getJobParameters();

@@ -1,22 +1,25 @@
-package com.christianoette._C_listeners._01_job_execution_listener_simple;
+package com.christianoette._C_listeners._04_listener_with_annotations;
 
 
 import org.junit.jupiter.api.Test;
-import org.springframework.batch.core.*;
+import org.springframework.batch.core.Job;
+import org.springframework.batch.core.JobParameters;
+import org.springframework.batch.core.JobParametersBuilder;
+import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
-import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.batch.test.JobLauncherTestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import java.util.Map;
-
-@SpringBootTest(classes = JobExecutionerListenerTest.TestConfig.class)
-class JobExecutionerListenerTest {
+@SpringBootTest(classes =
+        {AnnotationListenerTest.TestConfig.class, ReaderWithBeforeAndAfterStep.class
+        , ListenerWithAnnotations.class
+        })
+class AnnotationListenerTest {
 
     @Autowired
     private JobLauncherTestUtils jobLauncherTestUtils;
@@ -24,7 +27,6 @@ class JobExecutionerListenerTest {
     @Test
     void test() throws Exception {
         JobParameters jobParameters = new JobParametersBuilder()
-                .addParameter("outputText", new JobParameter("Hello Spring Batch"))
                 .toJobParameters();
         jobLauncherTestUtils.launchJob(jobParameters);
     }
@@ -39,21 +41,25 @@ class JobExecutionerListenerTest {
         @Autowired
         private StepBuilderFactory stepBuilderFactory;
 
+        @Autowired
+        private ReaderWithBeforeAndAfterStep readerWithBeforeAndAfterStep;
+
+        @Autowired
+        private ListenerWithAnnotations listenerWithAnnotations;
+
         @Bean
-        public Job executionListenerJob() {
-            Step step = stepBuilderFactory.get("executionListenerStep")
-                    .tasklet((contribution, chunkContext) -> {
-                        Map<String, Object> jobParameters = chunkContext.getStepContext()
-                                .getJobParameters();
-                        Object outputText = jobParameters.get("outputText");
-                        System.out.println(outputText);
+        public Job annotationListenerTest() {
+            Step step = stepBuilderFactory.get("step")
+                    .chunk(1)
+                    .reader(readerWithBeforeAndAfterStep)
+                    .writer(items -> {
 
-                        return RepeatStatus.FINISHED;
-                    }).build();
+                    })
+                    .listener(listenerWithAnnotations)
+                    .build();
 
-            return jobBuilderFactory.get("annotationListenerTest")
+            return jobBuilderFactory.get("job")
                     .start(step)
-                    .listener(new SimpleJobListener())
                     .build();
         }
 
