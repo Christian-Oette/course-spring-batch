@@ -1,7 +1,6 @@
 package com.christianoette._B_the_data_model._01_job_execution;
 
 import com.christianoette.testutils.CourseUtilBatchTestConfig;
-import com.christianoette.utils.CourseUtilJobSummaryListener;
 import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.*;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
@@ -43,16 +42,26 @@ class JobExecutionTest {
         @Bean
         public Job job() {
             Job myJob = jobBuilderFactory.get("myJob")
-                    .start(step())
-                    .listener(new CourseUtilJobSummaryListener())
+                    .start(stepOne())
+                    .start(stepTwo())
                     .build();
             return myJob;
         }
 
         @Bean
         @JobScope
-        public Step step() {
+        public Step stepOne() {
             return stepBuilderFactory.get("myFirstStep")
+                    .tasklet((stepContribution, chunkContext) -> {
+                        return RepeatStatus.FINISHED;
+                    })
+                    .build();
+        }
+
+        @Bean
+        @JobScope
+        public Step stepTwo() {
+            return stepBuilderFactory.get("mySecondStep")
                     .tasklet((stepContribution, chunkContext) -> {
                         return RepeatStatus.FINISHED;
                     })
