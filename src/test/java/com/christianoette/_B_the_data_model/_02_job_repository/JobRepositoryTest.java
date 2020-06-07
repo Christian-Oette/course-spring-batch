@@ -45,11 +45,10 @@ class JobRepositoryTest {
 
         @Bean
         public Job job() {
-            Job myJob = jobBuilderFactory.get("myJob")
+            return jobBuilderFactory.get("myJob")
                     .start(step())
                     .listener(new CourseUtilJobSummaryListener())
                     .build();
-            return myJob;
         }
 
 

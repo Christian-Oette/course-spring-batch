@@ -1,6 +1,7 @@
 package com.christianoette._E_validation_and_fault_tolerance._01_custom_validation;
 
 import com.christianoette.testutils.CourseUtilBatchTestConfig;
+import com.christianoette.utils.CourseUtilJobSummaryListener;
 import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.*;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
@@ -53,6 +54,7 @@ class ValidationTest {
                             }
                         }
                     })
+                    .listener(new CourseUtilJobSummaryListener())
                     .build();
         }
 

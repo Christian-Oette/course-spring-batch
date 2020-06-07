@@ -1,6 +1,7 @@
 package com.christianoette._E_validation_and_fault_tolerance._03_fault_tolerance_skip;
 
 import com.christianoette.testutils.CourseUtilBatchTestConfig;
+import com.christianoette.utils.CourseUtilJobSummaryListener;
 import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.*;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
@@ -56,6 +57,7 @@ class SkipItemsWithNullReturnTest {
         public Job job() {
             return jobBuilderFactory.get("myJob")
                     .start(readerStep())
+                    .listener(new CourseUtilJobSummaryListener())
                     .build();
         }
 

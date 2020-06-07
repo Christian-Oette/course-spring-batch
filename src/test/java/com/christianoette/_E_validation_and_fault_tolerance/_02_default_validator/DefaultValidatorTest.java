@@ -1,6 +1,7 @@
 package com.christianoette._E_validation_and_fault_tolerance._02_default_validator;
 
 import com.christianoette.testutils.CourseUtilBatchTestConfig;
+import com.christianoette.utils.CourseUtilJobSummaryListener;
 import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.*;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
@@ -52,6 +53,7 @@ class DefaultValidatorTest {
             return jobBuilderFactory.get("myJob")
                     .start(stepOne())
                     .validator(defaultValidator)
+                    .listener(new CourseUtilJobSummaryListener())
                     .build();
         }
 
