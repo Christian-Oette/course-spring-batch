@@ -1,4 +1,4 @@
-package com.christianoette._B_the_data_model._02_job_repository;
+package com.christianoette._E_validation_and_fault_tolerance._02_default_validator;
 
 import com.christianoette.testutils.CourseUtilBatchTestConfig;
 import com.christianoette.utils.CourseUtilJobSummaryListener;
@@ -7,6 +7,7 @@ import org.springframework.batch.core.*;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.JobScope;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
+import org.springframework.batch.core.job.DefaultJobParametersValidator;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.batch.test.JobLauncherTestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,12 +15,10 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import java.util.UUID;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
-@SpringBootTest(classes = {JobRepositoryTest.TestConfig.class, CourseUtilBatchTestConfig.class})
-class JobRepositoryTest {
+@SpringBootTest(classes = {DefaultValidatorTest.TestConfig.class, CourseUtilBatchTestConfig.class})
+class DefaultValidatorTest {
 
     @Autowired
     private JobLauncherTestUtils jobLauncherTestUtils;
@@ -27,10 +26,10 @@ class JobRepositoryTest {
     @Test
     void runJob() throws Exception {
         JobParameters jobParameters = new JobParametersBuilder()
-                .addParameter("id", new JobParameter(UUID.randomUUID().toString()))
+                .addParameter("parameterOne", new JobParameter(25L))
                 .toJobParameters();
         JobExecution jobExecution = jobLauncherTestUtils.launchJob(jobParameters);
-        assertThat(jobExecution.getStatus()).isEqualTo(BatchStatus.COMPLETED);
+        assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());
     }
 
     @SuppressWarnings("WeakerAccess")
@@ -45,24 +44,26 @@ class JobRepositoryTest {
 
         @Bean
         public Job job() {
+            String[] requiredParameter = new String[] {"parameterOne"};
+            String[] optionalParameter = new String[] {"optional"};
+
+            DefaultJobParametersValidator defaultValidator =
+                    new DefaultJobParametersValidator(requiredParameter, optionalParameter);
+
             return jobBuilderFactory.get("myJob")
-                    .start(step())
+                    .start(stepOne())
+                    .validator(defaultValidator)
                     .listener(new CourseUtilJobSummaryListener())
                     .build();
         }
 
-
         @Bean
         @JobScope
-        public Step step() {
-            return stepBuilderFactory.get("myFirstStep")
-                    .tasklet((stepContribution, chunkContext) -> {
-                        return RepeatStatus.FINISHED;
-                    })
+        public Step stepOne() {
+            return stepBuilderFactory.get("dummyStep")
+                    .tasklet((stepContribution, chunkContext) -> RepeatStatus.FINISHED)
                     .build();
         }
-
-
     }
 
 }

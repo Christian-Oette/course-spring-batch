@@ -1,7 +1,9 @@
-package com.christianoette._B_the_data_model._02_job_repository;
+package com.christianoette._B_the_data_model._03_job_exit_status;
 
 import com.christianoette.testutils.CourseUtilBatchTestConfig;
 import com.christianoette.utils.CourseUtilJobSummaryListener;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.*;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
@@ -18,8 +20,10 @@ import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@SpringBootTest(classes = {JobRepositoryTest.TestConfig.class, CourseUtilBatchTestConfig.class})
-class JobRepositoryTest {
+@SpringBootTest(classes = {ExitStatusTest.TestConfig.class, CourseUtilBatchTestConfig.class})
+class ExitStatusTest {
+
+    private static final Logger LOGGER = LogManager.getLogger(ExitStatusTest.class);
 
     @Autowired
     private JobLauncherTestUtils jobLauncherTestUtils;
@@ -31,6 +35,9 @@ class JobRepositoryTest {
                 .toJobParameters();
         JobExecution jobExecution = jobLauncherTestUtils.launchJob(jobParameters);
         assertThat(jobExecution.getStatus()).isEqualTo(BatchStatus.COMPLETED);
+
+        ExitStatus exitStatus = jobExecution.getExitStatus();
+        LOGGER.info(exitStatus);
     }
 
     @SuppressWarnings("WeakerAccess")
@@ -45,10 +52,11 @@ class JobRepositoryTest {
 
         @Bean
         public Job job() {
-            return jobBuilderFactory.get("myJob")
+            Job myJob = jobBuilderFactory.get("myJob")
                     .start(step())
                     .listener(new CourseUtilJobSummaryListener())
                     .build();
+            return myJob;
         }
 
 
@@ -57,6 +65,13 @@ class JobRepositoryTest {
         public Step step() {
             return stepBuilderFactory.get("myFirstStep")
                     .tasklet((stepContribution, chunkContext) -> {
+                        JobExecution jobExecution =
+                                chunkContext.getStepContext().getStepExecution().getJobExecution();
+                        ExitStatus exitStatus = jobExecution.getExitStatus();
+                        exitStatus.addExitDescription("Exit text");
+                        stepContribution.getExitStatus().addExitDescription("Exit");
+                        stepContribution.setExitStatus(new ExitStatus("1", "description"));
+
                         return RepeatStatus.FINISHED;
                     })
                     .build();

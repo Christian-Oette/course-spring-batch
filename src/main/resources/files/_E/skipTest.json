@@ -1,0 +1,26 @@
+[
+  {
+    "item": "One",
+    "skipIt": false
+  },
+  {
+    "item": "Two",
+    "skipIt": true
+  },
+  {
+    "item": "Three",
+    "skipIt": false
+  },
+  {
+    "item": "Four",
+    "skipIt": false
+  },
+  {
+    "item": "Five",
+    "skipIt": false
+  },
+  {
+    "item":"Six",
+    "skipIt": true
+  }
+]
