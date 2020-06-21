@@ -7,6 +7,7 @@ import org.springframework.batch.core.*;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.JobScope;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
+import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.batch.test.JobLauncherTestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,12 +25,17 @@ class JobRepositoryTest {
     @Autowired
     private JobLauncherTestUtils jobLauncherTestUtils;
 
+    @Autowired
+    private JobRepository jobRepository;
+
     @Test
     void runJob() throws Exception {
         JobParameters jobParameters = new JobParametersBuilder()
                 .addParameter("id", new JobParameter(UUID.randomUUID().toString()))
                 .toJobParameters();
-        JobExecution jobExecution = jobLauncherTestUtils.launchJob(jobParameters);
+        jobLauncherTestUtils.launchJob(jobParameters);
+
+        JobExecution jobExecution = jobRepository.getLastJobExecution("myJob", jobParameters);
         assertThat(jobExecution.getStatus()).isEqualTo(BatchStatus.COMPLETED);
     }
 
