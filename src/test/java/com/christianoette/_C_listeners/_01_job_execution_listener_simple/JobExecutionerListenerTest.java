@@ -2,7 +2,9 @@ package com.christianoette._C_listeners._01_job_execution_listener_simple;
 
 
 import org.junit.jupiter.api.Test;
-import org.springframework.batch.core.*;
+import org.springframework.batch.core.Job;
+import org.springframework.batch.core.JobParameters;
+import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
@@ -13,8 +15,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import java.util.Map;
-
 @SpringBootTest(classes = JobExecutionerListenerTest.TestConfig.class)
 class JobExecutionerListenerTest {
 
@@ -23,10 +23,7 @@ class JobExecutionerListenerTest {
 
     @Test
     void test() throws Exception {
-        JobParameters jobParameters = new JobParametersBuilder()
-                .addParameter("outputText", new JobParameter("Hello Spring Batch"))
-                .toJobParameters();
-        jobLauncherTestUtils.launchJob(jobParameters);
+        jobLauncherTestUtils.launchJob(new JobParameters());
     }
 
     @Configuration
@@ -43,17 +40,11 @@ class JobExecutionerListenerTest {
         public Job executionListenerJob() {
             Step step = stepBuilderFactory.get("executionListenerStep")
                     .tasklet((contribution, chunkContext) -> {
-                        Map<String, Object> jobParameters = chunkContext.getStepContext()
-                                .getJobParameters();
-                        Object outputText = jobParameters.get("outputText");
-                        System.out.println(outputText);
-
                         return RepeatStatus.FINISHED;
                     }).build();
 
             return jobBuilderFactory.get("annotationListenerTest")
                     .start(step)
-                    .listener(new SimpleJobListener())
                     .build();
         }
 
