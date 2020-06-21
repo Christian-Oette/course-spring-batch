@@ -15,10 +15,10 @@ import org.springframework.context.annotation.Configuration;
 
 import java.util.Map;
 
-@SpringBootTest(classes = {JobExecutionerListenerTest.TestConfig.class,
+@SpringBootTest(classes = {JobExecutionerListenerAndResultHolderTest.TestConfig.class,
         JobResultHolder.class,
         JobListenerAsComponent.class})
-class JobExecutionerListenerTest {
+class JobExecutionerListenerAndResultHolderTest {
 
     @Autowired
     private JobLauncherTestUtils jobLauncherTestUtils;
@@ -55,7 +55,7 @@ class JobExecutionerListenerTest {
                                 .getJobParameters();
                         Object outputText = jobParameters.get("outputText");
                         System.out.println(outputText);
-                        jobResultHolder.result = "GLOBAL-JOB_RESULT";
+                        jobResultHolder.setResult("GLOBAL-JOB_RESULT");
 
                         return RepeatStatus.FINISHED;
                     }).build();

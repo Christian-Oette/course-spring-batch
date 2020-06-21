@@ -24,11 +24,11 @@ public class JobListenerAsComponent implements JobExecutionListener {
 
     @Override
     public void beforeJob(JobExecution jobExecution) {
-        System.out.println("Global result before job "+jobResultHolder.result);
+        System.out.println("Global result before job "+jobResultHolder.getResult());
     }
 
     @Override
     public void afterJob(JobExecution jobExecution) {
-        System.out.println("Global result after job "+jobResultHolder.result);
+        System.out.println("Global result after job "+jobResultHolder.getResult());
     }
 }
