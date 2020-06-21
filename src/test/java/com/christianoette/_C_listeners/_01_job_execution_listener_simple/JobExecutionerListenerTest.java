@@ -3,6 +3,7 @@ package com.christianoette._C_listeners._01_job_execution_listener_simple;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.Job;
+import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
@@ -15,6 +16,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 @SpringBootTest(classes = JobExecutionerListenerTest.TestConfig.class)
 class JobExecutionerListenerTest {
 
@@ -23,7 +26,8 @@ class JobExecutionerListenerTest {
 
     @Test
     void test() throws Exception {
-        jobLauncherTestUtils.launchJob(new JobParameters());
+        JobExecution jobExecution = jobLauncherTestUtils.launchJob(new JobParameters());
+        assertThat(jobExecution.getExitStatus().getExitDescription()).isEqualTo("custom description");
     }
 
     @Configuration
@@ -45,6 +49,7 @@ class JobExecutionerListenerTest {
 
             return jobBuilderFactory.get("annotationListenerTest")
                     .start(step)
+                    .listener(new SimpleJobListener())
                     .build();
         }
 
