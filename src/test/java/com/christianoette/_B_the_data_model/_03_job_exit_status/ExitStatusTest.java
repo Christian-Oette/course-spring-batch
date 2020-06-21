@@ -65,13 +65,6 @@ class ExitStatusTest {
         public Step step() {
             return stepBuilderFactory.get("myFirstStep")
                     .tasklet((stepContribution, chunkContext) -> {
-                        JobExecution jobExecution =
-                                chunkContext.getStepContext().getStepExecution().getJobExecution();
-                        ExitStatus exitStatus = jobExecution.getExitStatus();
-                        exitStatus.addExitDescription("Exit text");
-                        stepContribution.getExitStatus().addExitDescription("Exit");
-                        stepContribution.setExitStatus(new ExitStatus("1", "description"));
-
                         return RepeatStatus.FINISHED;
                     })
                     .build();
