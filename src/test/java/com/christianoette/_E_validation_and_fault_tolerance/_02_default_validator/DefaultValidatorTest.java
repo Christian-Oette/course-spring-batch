@@ -7,7 +7,6 @@ import org.springframework.batch.core.*;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.JobScope;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
-import org.springframework.batch.core.job.DefaultJobParametersValidator;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.batch.test.JobLauncherTestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,15 +43,8 @@ class DefaultValidatorTest {
 
         @Bean
         public Job job() {
-            String[] requiredParameter = new String[] {"parameterOne"};
-            String[] optionalParameter = new String[] {"optional"};
-
-            DefaultJobParametersValidator defaultValidator =
-                    new DefaultJobParametersValidator(requiredParameter, optionalParameter);
-
             return jobBuilderFactory.get("myJob")
                     .start(stepOne())
-                    .validator(defaultValidator)
                     .listener(new CourseUtilJobSummaryListener())
                     .build();
         }
