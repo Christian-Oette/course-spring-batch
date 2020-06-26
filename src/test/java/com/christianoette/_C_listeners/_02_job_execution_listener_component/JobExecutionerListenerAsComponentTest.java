@@ -13,8 +13,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-@SpringBootTest(classes = {JobExecutionerListenerAsComponentTest.TestConfig.class,
-        JobListenerAsComponent.class})
+@SpringBootTest(classes = {JobExecutionerListenerAsComponentTest.TestConfig.class})
 class JobExecutionerListenerAsComponentTest {
 
     @Autowired
