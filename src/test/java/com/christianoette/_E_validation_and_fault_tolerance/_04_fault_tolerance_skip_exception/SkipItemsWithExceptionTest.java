@@ -72,12 +72,15 @@ class SkipItemsWithExceptionTest {
                         @Override
                         public SkipTestData process(SkipTestData item) throws Exception {
                             if (item.skipIt) {
-                                return null;
+                                throw new CustomSkipException();
                             } else {
                                 return item;
                             }
                         }
                     })
+                    .faultTolerant()
+                    .skip(CustomSkipException.class)
+                    .skipLimit(2)
                     .writer(writer())
                     .build();
         }
