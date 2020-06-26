@@ -16,8 +16,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @SpringBootTest(classes =
-        {AnnotationListenerTest.TestConfig.class, ReaderWithBeforeAndAfterStep.class
-        , ListenerWithAnnotations.class
+        {AnnotationListenerTest.TestConfig.class,
+                ReaderWithBeforeAndAfterStep.class
+                , ListenerWithAnnotations.class
         })
 class AnnotationListenerTest {
 
@@ -50,7 +51,7 @@ class AnnotationListenerTest {
         @Bean
         public Job annotationListenerTest() {
             Step step = stepBuilderFactory.get("step")
-                    .chunk(1)
+                    .chunk(2)
                     .reader(readerWithBeforeAndAfterStep)
                     .writer(items -> {
 
