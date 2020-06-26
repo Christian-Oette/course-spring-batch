@@ -10,6 +10,7 @@ import org.springframework.batch.core.*;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.JobScope;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
+import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.batch.test.JobLauncherTestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +21,7 @@ import org.springframework.context.annotation.Configuration;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @SpringBootTest(classes = {StepExecutionListenerTest.TestConfig.class,
-        CourseUtilBatchTestConfig.class})
+        CourseUtilBatchTestConfig.class, StepAndListenerInOneComponent.class})
 class StepExecutionListenerTest {
 
     private static final Logger LOGGER = LogManager.getLogger(CourseUtilJobSummaryListener.class);
@@ -64,7 +65,8 @@ class StepExecutionListenerTest {
         @JobScope
         public Step stepOne() {
             return stepBuilderFactory.get("myFirstStep")
-                    .tasklet(null)
+                    .tasklet(stepAndListenerInOneComponent)
+                    .listener(stepAndListenerInOneComponent)
                     .build();
         }
 
@@ -73,6 +75,10 @@ class StepExecutionListenerTest {
         public Step stepTwo() {
             return stepBuilderFactory.get("mySecondStep")
                     .tasklet((stepContribution, chunkContext) -> {
+                        ExecutionContext executionContext = stepContribution.getStepExecution()
+                                .getJobExecution().getExecutionContext();
+                        int intermediateResult = executionContext.getInt("intermediateResult");
+                        LOGGER.info("Intermediate Result is {}", intermediateResult);
                         return RepeatStatus.FINISHED;
                     }).build();
         }
