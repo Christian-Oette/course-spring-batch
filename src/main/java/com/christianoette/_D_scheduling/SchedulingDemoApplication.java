@@ -5,11 +5,13 @@ import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.PropertySource;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
 @EnableAutoConfiguration
 @ComponentScan(basePackageClasses = SchedulingDemoApplication.class)
 @EntityScan(basePackageClasses = SchedulingDemoApplication.class)
 @PropertySource("/context/without-web-schedule.properties")
+@EnableScheduling
 public class SchedulingDemoApplication {
 
 	public static void main(String[] args) {
