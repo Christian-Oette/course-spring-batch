@@ -7,6 +7,7 @@ import org.springframework.batch.core.*;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
 import org.springframework.batch.core.step.builder.SimpleStepBuilder;
+import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.json.JacksonJsonObjectMarshaller;
 import org.springframework.batch.item.json.JacksonJsonObjectReader;
 import org.springframework.batch.item.json.JsonFileItemWriter;
@@ -67,6 +68,13 @@ class SkipItemsWithNullReturnTest {
                     .chunk(1);
 
             return simpleStepBuilder.reader(reader())
+                    .processor((ItemProcessor<SkipTestData, SkipTestData>) item -> {
+                        if (item.skipIt) {
+                            return null;
+                        } else {
+                            return item;
+                        }
+                    })
                     .writer(writer()).build();
         }
 
