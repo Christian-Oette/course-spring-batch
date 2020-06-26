@@ -45,15 +45,6 @@ class ValidationTest {
         public Job job() {
             return jobBuilderFactory.get("myJob")
                     .start(stepOne())
-                    .validator(new JobParametersValidator() {
-                        @Override
-                        public void validate(JobParameters parameters) throws JobParametersInvalidException {
-                            Long parameterOne = parameters.getLong("parameterOne");
-                            if (parameterOne == null || parameterOne < 30L) {
-                                throw new JobParametersInvalidException("invalid parameterOne");
-                            }
-                        }
-                    })
                     .listener(new CourseUtilJobSummaryListener())
                     .build();
         }
