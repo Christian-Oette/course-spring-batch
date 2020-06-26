@@ -11,7 +11,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @ComponentScan(basePackageClasses = SchedulingDemoApplication.class)
 @EntityScan(basePackageClasses = SchedulingDemoApplication.class)
 @EnableScheduling
-@PropertySource("/context/without-web-context.properties")
+@PropertySource("/context/without-web-schedule.properties")
 public class SchedulingDemoApplication {
 
 	public static void main(String[] args) {
