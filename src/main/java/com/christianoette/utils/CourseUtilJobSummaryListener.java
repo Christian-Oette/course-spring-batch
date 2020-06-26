@@ -36,7 +36,7 @@ public class CourseUtilJobSummaryListener implements JobExecutionListener {
                 out.flush();
             }
         } catch (Exception ex) {
-            LOGGER.error("Couldn't created summary", ex);
+            LOGGER.error("Couldn't create summary", ex);
         }
     }
 }
