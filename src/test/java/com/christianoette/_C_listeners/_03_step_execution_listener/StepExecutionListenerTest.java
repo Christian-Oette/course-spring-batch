@@ -21,16 +21,10 @@ import org.springframework.context.annotation.Configuration;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @SpringBootTest(classes = {StepExecutionListenerTest.TestConfig.class,
-<<<<<<< HEAD
-        CourseUtilBatchTestConfig.class, StepAndListenerInOneComponent.class})
-=======
-        StepAndListenerInOneComponent.class,
         CourseUtilBatchTestConfig.class})
->>>>>>> parent of 7410ca8... StepAndListenerInOneComponent prepared
 class StepExecutionListenerTest {
 
     private static final Logger LOGGER = LogManager.getLogger(CourseUtilJobSummaryListener.class);
-
 
     @Autowired
     private JobLauncherTestUtils jobLauncherTestUtils;
@@ -54,9 +48,6 @@ class StepExecutionListenerTest {
         @Autowired
         private StepBuilderFactory stepBuilderFactory;
 
-        @Autowired
-        private StepAndListenerInOneComponent stepAndListenerInOneComponent;
-
         @Bean
         public Job job() {
             Job myJob = jobBuilderFactory.get("myJob")
@@ -70,8 +61,7 @@ class StepExecutionListenerTest {
         @JobScope
         public Step stepOne() {
             return stepBuilderFactory.get("myFirstStep")
-                    .tasklet(stepAndListenerInOneComponent)
-                    .listener(stepAndListenerInOneComponent)
+                    .tasklet(null)
                     .build();
         }
 
@@ -80,16 +70,6 @@ class StepExecutionListenerTest {
         public Step stepTwo() {
             return stepBuilderFactory.get("mySecondStep")
                     .tasklet((stepContribution, chunkContext) -> {
-<<<<<<< HEAD
-                        ExecutionContext executionContext = stepContribution.getStepExecution()
-                                .getJobExecution().getExecutionContext();
-                        int intermediateResult = executionContext.getInt("intermediateResult");
-                        LOGGER.info("Intermediate Result is {}", intermediateResult);
-=======
-                        ExecutionContext executionContext = stepContribution.getStepExecution().getJobExecution().getExecutionContext();
-                        int intermediateResult = executionContext.getInt("intermediateResult");
-                        LOGGER.info("Double intermediate result of former step is {}", intermediateResult * 2);
->>>>>>> parent of 7410ca8... StepAndListenerInOneComponent prepared
                         return RepeatStatus.FINISHED;
                     }).build();
         }
