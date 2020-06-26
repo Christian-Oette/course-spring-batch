@@ -13,7 +13,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-@SpringBootTest(classes = {JobExecutionerListenerAsComponentTest.TestConfig.class})
+@SpringBootTest(classes = {JobExecutionerListenerAsComponentTest.TestConfig.class,
+        JobListenerAsComponent.class, JobResultHolder.class
+})
 class JobExecutionerListenerAsComponentTest {
 
     @Autowired
@@ -37,15 +39,24 @@ class JobExecutionerListenerAsComponentTest {
         @Autowired
         private StepBuilderFactory stepBuilderFactory;
 
+        @Autowired
+        private JobListenerAsComponent jobListener;
+
+        @Autowired
+        private JobResultHolder jobResultHolder;
+
         @Bean
         public Job executionListenerJob() {
             Step step = stepBuilderFactory.get("annotationListenerTest")
                     .tasklet((contribution, chunkContext) -> {
+                        String result = "Tasklet result";
+                        jobResultHolder.setResult(result);
                         return RepeatStatus.FINISHED;
                     }).build();
 
             return jobBuilderFactory.get("helloWorldJob")
                     .start(step)
+                    .listener(jobListener)
                     .build();
         }
 
