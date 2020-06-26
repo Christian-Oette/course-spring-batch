@@ -44,6 +44,7 @@ class BasicFlowTest {
         public Job job() {
             return jobBuilderFactory.get("myJob")
                    .start(stepOne())
+                    .listener(new CourseUtilJobSummaryListener())
                     .build();
         }
 
