@@ -13,12 +13,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import java.util.Map;
-
-@SpringBootTest(classes = {JobExecutionerListenerAndResultHolderTest.TestConfig.class,
-        JobResultHolder.class,
+@SpringBootTest(classes = {JobExecutionerListenerAsComponentTest.TestConfig.class,
         JobListenerAsComponent.class})
-class JobExecutionerListenerAndResultHolderTest {
+class JobExecutionerListenerAsComponentTest {
 
     @Autowired
     private JobLauncherTestUtils jobLauncherTestUtils;
@@ -41,28 +38,15 @@ class JobExecutionerListenerAndResultHolderTest {
         @Autowired
         private StepBuilderFactory stepBuilderFactory;
 
-        @Autowired
-        private JobListenerAsComponent jobListenerAsComponent;
-
-        @Autowired
-        private JobResultHolder jobResultHolder;
-
         @Bean
         public Job executionListenerJob() {
             Step step = stepBuilderFactory.get("annotationListenerTest")
                     .tasklet((contribution, chunkContext) -> {
-                        Map<String, Object> jobParameters = chunkContext.getStepContext()
-                                .getJobParameters();
-                        Object outputText = jobParameters.get("outputText");
-                        System.out.println(outputText);
-                        jobResultHolder.setResult("GLOBAL-JOB_RESULT");
-
                         return RepeatStatus.FINISHED;
                     }).build();
 
             return jobBuilderFactory.get("helloWorldJob")
                     .start(step)
-                    .listener(jobListenerAsComponent)
                     .build();
         }
 
