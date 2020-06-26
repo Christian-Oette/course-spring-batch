@@ -25,7 +25,7 @@ class ValidationTest {
     @Test
     void runJob() throws Exception {
         JobParameters jobParameters = new JobParametersBuilder()
-                .addParameter("parameterOne", new JobParameter(25L))
+                .addParameter("parameterOne", new JobParameter(35L))
                 .toJobParameters();
         JobExecution jobExecution = jobLauncherTestUtils.launchJob(jobParameters);
         assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());
@@ -45,6 +45,15 @@ class ValidationTest {
         public Job job() {
             return jobBuilderFactory.get("myJob")
                     .start(stepOne())
+                    .validator(new JobParametersValidator() {
+                        @Override
+                        public void validate(JobParameters parameters) throws JobParametersInvalidException {
+                            Long parameterOne = parameters.getLong("parameterOne");
+                            if (parameterOne == null || parameterOne < 30L) {
+                                throw new JobParametersInvalidException("parameterOne must be greater then 30");
+                            }
+                        }
+                    })
                     .listener(new CourseUtilJobSummaryListener())
                     .build();
         }
