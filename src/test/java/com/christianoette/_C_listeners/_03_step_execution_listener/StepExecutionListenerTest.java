@@ -10,7 +10,6 @@ import org.springframework.batch.core.*;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.JobScope;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
-import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.batch.test.JobLauncherTestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +20,6 @@ import org.springframework.context.annotation.Configuration;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @SpringBootTest(classes = {StepExecutionListenerTest.TestConfig.class,
-        StepAndListenerInOneComponent.class,
         CourseUtilBatchTestConfig.class})
 class StepExecutionListenerTest {
 
@@ -66,8 +64,7 @@ class StepExecutionListenerTest {
         @JobScope
         public Step stepOne() {
             return stepBuilderFactory.get("myFirstStep")
-                    .tasklet(stepAndListenerInOneComponent)
-                    .listener(stepAndListenerInOneComponent)
+                    .tasklet(null)
                     .build();
         }
 
@@ -76,9 +73,6 @@ class StepExecutionListenerTest {
         public Step stepTwo() {
             return stepBuilderFactory.get("mySecondStep")
                     .tasklet((stepContribution, chunkContext) -> {
-                        ExecutionContext executionContext = stepContribution.getStepExecution().getJobExecution().getExecutionContext();
-                        int intermediateResult = executionContext.getInt("intermediateResult");
-                        LOGGER.info("Double intermediate result of former step is {}", intermediateResult * 2);
                         return RepeatStatus.FINISHED;
                     }).build();
         }
