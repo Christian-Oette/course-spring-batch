@@ -26,7 +26,6 @@ class StepExecutionListenerTest {
 
     private static final Logger LOGGER = LogManager.getLogger(CourseUtilJobSummaryListener.class);
 
-
     @Autowired
     private JobLauncherTestUtils jobLauncherTestUtils;
 
