@@ -18,12 +18,20 @@ public class StepAndListenerInOneComponent implements Tasklet, StepExecutionList
 
     @Override
     public void beforeStep(StepExecution stepExecution) {
+<<<<<<< HEAD
+
+    }
+
+    @Override
+    public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
+=======
         stepExecution.getExecutionContext();
     }
 
     @Override
     public RepeatStatus execute(StepContribution contribution,
                                 ChunkContext chunkContext) {
+>>>>>>> parent of 7410ca8... StepAndListenerInOneComponent prepared
         intermediateResult = 42;
         return RepeatStatus.FINISHED;
     }
@@ -31,7 +39,11 @@ public class StepAndListenerInOneComponent implements Tasklet, StepExecutionList
     @Override
     public ExitStatus afterStep(StepExecution stepExecution) {
         stepExecution.getJobExecution().getExecutionContext()
+<<<<<<< HEAD
+                .putInt("intermediateResult",intermediateResult);
+=======
                 .putInt("intermediateResult", intermediateResult);
+>>>>>>> parent of 7410ca8... StepAndListenerInOneComponent prepared
         return stepExecution.getExitStatus();
     }
 }

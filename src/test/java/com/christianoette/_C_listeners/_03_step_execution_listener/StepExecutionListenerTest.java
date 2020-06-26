@@ -21,8 +21,12 @@ import org.springframework.context.annotation.Configuration;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @SpringBootTest(classes = {StepExecutionListenerTest.TestConfig.class,
+<<<<<<< HEAD
+        CourseUtilBatchTestConfig.class, StepAndListenerInOneComponent.class})
+=======
         StepAndListenerInOneComponent.class,
         CourseUtilBatchTestConfig.class})
+>>>>>>> parent of 7410ca8... StepAndListenerInOneComponent prepared
 class StepExecutionListenerTest {
 
     private static final Logger LOGGER = LogManager.getLogger(CourseUtilJobSummaryListener.class);
@@ -76,9 +80,16 @@ class StepExecutionListenerTest {
         public Step stepTwo() {
             return stepBuilderFactory.get("mySecondStep")
                     .tasklet((stepContribution, chunkContext) -> {
+<<<<<<< HEAD
+                        ExecutionContext executionContext = stepContribution.getStepExecution()
+                                .getJobExecution().getExecutionContext();
+                        int intermediateResult = executionContext.getInt("intermediateResult");
+                        LOGGER.info("Intermediate Result is {}", intermediateResult);
+=======
                         ExecutionContext executionContext = stepContribution.getStepExecution().getJobExecution().getExecutionContext();
                         int intermediateResult = executionContext.getInt("intermediateResult");
                         LOGGER.info("Double intermediate result of former step is {}", intermediateResult * 2);
+>>>>>>> parent of 7410ca8... StepAndListenerInOneComponent prepared
                         return RepeatStatus.FINISHED;
                     }).build();
         }
