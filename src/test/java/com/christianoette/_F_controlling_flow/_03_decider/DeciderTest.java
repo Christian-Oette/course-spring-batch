@@ -55,8 +55,14 @@ class DeciderTest {
 
         @Bean
         public Flow flow() {
+            FlagDecider flagDecider = new FlagDecider();
             return new FlowBuilder<SimpleFlow>("fallbackFlow")
                     .start(stepOne())
+                    .next(flagDecider)
+                    .on("YES")
+                    .end()
+                    .on("NO")
+                    .to(fallBackStep())
                     .end();
         }
 
@@ -66,7 +72,7 @@ class DeciderTest {
                     .tasklet((stepContribution, chunkContext) -> {
                         ExecutionContext executionContext = stepContribution.getStepExecution()
                                 .getExecutionContext();
-                        executionContext.put("succeeded", true);
+                        executionContext.put("succeeded", false);
                         executionContext.put("FLAG", "YES");
                         return RepeatStatus.FINISHED;
                     })
