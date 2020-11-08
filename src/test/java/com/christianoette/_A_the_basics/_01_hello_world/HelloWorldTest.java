@@ -6,11 +6,12 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
+@Disabled // TODO Remove disabled, if test won't start in your ide!
 class HelloWorldTest {
 
     @Test
-    @Disabled // TODO Remove disabled in your project if test won't start!
-    void test() {
+    @Disabled // TODO Remove disabled, if test won't start in your ide!
+    public void test() {
         // start here!
     }
 }
