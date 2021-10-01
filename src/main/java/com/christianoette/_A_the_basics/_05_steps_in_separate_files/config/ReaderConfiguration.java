@@ -4,7 +4,7 @@ import com.christianoette._A_the_basics._05_steps_in_separate_files.dto.InputDat
 import com.christianoette.utils.CourseUtils;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepScope;
-import org.springframework.batch.item.ItemReader;
+import org.springframework.batch.item.ItemStreamReader;
 import org.springframework.batch.item.json.JacksonJsonObjectReader;
 import org.springframework.batch.item.json.builder.JsonItemReaderBuilder;
 import org.springframework.beans.factory.annotation.Value;
@@ -23,7 +23,7 @@ public class ReaderConfiguration {
 
     @Bean("myJsonItemReader")
     @StepScope
-    public ItemReader<InputData> reader(@Value("#{jobParameters['inputPath']}") String inputPath) {
+    public ItemStreamReader<InputData> reader(@Value("#{jobParameters['inputPath']}") String inputPath) {
         Resource inputResource = CourseUtils.getFileResource(inputPath);
 
         return new JsonItemReaderBuilder<InputData>()
