@@ -19,6 +19,7 @@
 		<compiler.version>11</compiler.version>
 		<junit-jupiter.version>5.5.2</junit-jupiter.version>
 		<freemarker.version>2.3.29</freemarker.version>
+		<log4j2.version>2.15.0</log4j2.version>
 	</properties>
 
 	<dependencies>
