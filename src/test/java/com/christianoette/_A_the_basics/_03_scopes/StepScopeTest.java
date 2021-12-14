@@ -11,6 +11,8 @@ import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.builder.SimpleStepBuilder;
 import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.item.ItemProcessor;
+import org.springframework.batch.item.ItemReader;
+import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.json.JacksonJsonObjectMarshaller;
 import org.springframework.batch.item.json.JacksonJsonObjectReader;
 import org.springframework.batch.item.json.JsonFileItemWriter;
@@ -71,21 +73,21 @@ class StepScopeTest {
         private StepBuilderFactory stepBuilderFactory;
 
         @Bean
-        public Job job() {
+        public Job job(ItemReader<InputData> reader, ItemWriter<OutputData> itemWriter) {
             return jobBuilderFactory.get("myJob")
-                    .start(readerStep())
+                    .start(readerStep(reader, itemWriter))
                     .build();
         }
 
         @Bean
-        public Step readerStep() {
+        public Step readerStep(ItemReader<InputData> reader, ItemWriter<OutputData> writer) {
             SimpleStepBuilder<InputData, OutputData> simpleStepBuilder
                     = stepBuilderFactory.get("readJsonStep")
                     .chunk(1);
 
-            return simpleStepBuilder.reader(reader(null))
+            return simpleStepBuilder.reader(reader)
                     .processor(processor())
-                    .writer(writer(null)).build();
+                    .writer(writer).build();
         }
 
         private ItemProcessor<InputData, OutputData> processor() {
